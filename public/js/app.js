@@ -5314,7 +5314,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['title', 'components']
+  props: ['card']
 });
 
 /***/ }),
@@ -5348,7 +5348,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['classes', 'title', 'input']
+  props: ['classes', 'title']
 });
 
 /***/ }),
@@ -5365,7 +5365,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: []
+  props: [],
+  data: function data() {
+    return {};
+  },
+  methods: {},
+  computed: {},
+  mounted: function mounted() {}
 });
 
 /***/ }),
@@ -5403,15 +5409,7 @@ var render = function render() {
   var _vm = this,
       _c = _vm._self._c;
 
-  return _c("div", {
-    staticClass: "card"
-  }, [_vm.components.header ? _c("div", {
-    staticClass: "card-header"
-  }, [_vm._v("\n        " + _vm._s(_vm.title) + "\n        "), _vm._t("header")], 2) : _vm._e(), _vm._v(" "), _vm.components.body ? _c("div", {
-    staticClass: "card-body"
-  }, [_vm._t("content")], 2) : _vm._e(), _vm._v(" "), _vm.components.footer ? _c("div", {
-    staticClass: "card-footer"
-  }, [_vm._t("footer")], 2) : _vm._e()]);
+  return _c("div");
 };
 
 var staticRenderFns = [];
@@ -5465,30 +5463,13 @@ var render = function render() {
     staticClass: "form-group",
     "class": _vm.classes
   }, [_c("label", {
-    staticClass: "col-md-4 col-form-label text-md-end",
-    attrs: {
-      "for": "email"
-    }
-  }, [_vm._v(" " + _vm._s(_vm.title) + " ")]), _vm._v(" "), _vm._m(0)]);
+    staticClass: "col-md-4 col-form-label text-md-end"
+  }, [_vm._v(" " + _vm._s(_vm.title) + " ")]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_vm._t("default")], 2)]);
 };
 
-var staticRenderFns = [function () {
-  var _vm = this,
-      _c = _vm._self._c;
-
-  return _c("div", {
-    staticClass: "col-md-6"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      id: "email",
-      type: "email",
-      value: "",
-      required: "",
-      autofocus: ""
-    }
-  })]);
-}];
+var staticRenderFns = [];
 render._withStripped = true;
 
 
@@ -5516,52 +5497,7 @@ var render = function render() {
     staticClass: "row justify-content-center"
   }, [_c("div", {
     staticClass: "col-md-8"
-  }, [_c("card-component", {
-    attrs: {
-      title: "Login",
-      components: {
-        header: true,
-        body: true,
-        footer: false
-      }
-    },
-    scopedSlots: _vm._u([{
-      key: "content",
-      fn: function fn() {
-        return [_c("input-component", {
-          attrs: {
-            classes: "row col-md-12",
-            title: "Username",
-            input: {
-              type: "text",
-              id: "username",
-              value: null,
-              placeholder: "insert username"
-            }
-          }
-        }), _vm._v(" "), _c("br"), _vm._v(" "), _c("input-component", {
-          attrs: {
-            classes: "row col-md-12",
-            title: "Super Big Password",
-            input: {
-              type: "password",
-              id: "password",
-              value: null,
-              placeholder: "insert password"
-            }
-          }
-        }), _vm._v(" "), _c("br"), _vm._v(" "), _c("div", {
-          staticClass: "col-md-8 offset-md-4"
-        }, [_c("button", {
-          staticClass: "btn btn-primary",
-          attrs: {
-            type: "submit"
-          }
-        }, [_vm._v("\n                            Login\n                        ")])])];
-      },
-      proxy: true
-    }])
-  })], 1)])]);
+  }, [_c("card-component")], 1)])]);
 };
 
 var staticRenderFns = [];

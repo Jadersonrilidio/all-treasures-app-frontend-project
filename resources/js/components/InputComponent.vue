@@ -1,9 +1,9 @@
 <template>
     <div class="form-group" :class="classes">
-        <label for="email" class="col-md-4 col-form-label text-md-end"> {{ title }} </label>
+        <label class="col-md-4 col-form-label text-md-end"> {{ title }} </label>
 
         <div class="col-md-6">
-            <input id="email" type="email" class="form-control" value="" required autofocus>
+            <slot></slot>
         </div>
     </div>
 </template>
@@ -12,8 +12,7 @@
     export default {
         props: [
             'classes',
-            'title',
-            'input',
-        ],
+            'title'
+        ]
     }
 </script>
