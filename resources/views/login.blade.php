@@ -2,6 +2,9 @@
 
 @section('content')
 
-    <login-component></login-component>
+    <login-component
+        form-action="{{ route('login.login') }}"
+        csrf_token="{{ @csrf_token() }}">
+    </login-component>
 
 @endsection

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,24 +13,26 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-// middleware('auth.simple')->
-
 Route::get('/', function () {
+    if (!isset($_SESSION)) session_start();
     return view('welcome');
 })->name('welcome');
 
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
+Route::middleware('guest.only')->get('/login', [App\Http\Controllers\LoginController::class, 'index'])->name('login.index');
+Route::middleware('guest.only')->post('/login', [App\Http\Controllers\LoginController::class, 'login'])->name('login.login');
+Route::middleware('auth.only')->post('/logout', [App\Http\Controllers\LoginController::class, 'logout'])->name('login.logout');
 
-Route::get('/register', function () {
+Route::middleware('guest.only')->get('/register', function () {
+    if (!isset($_SESSION)) session_start();
     return view('register');
 })->name('register');
 
-Route::middleware('auth.simple')->get('/home', function () {
+Route::middleware('auth.only')->get('/home', function () {
+    if (!isset($_SESSION)) session_start();
     return view('home');
 })->name('home');
 
 Route::fallback(function () {
+    if (!isset($_SESSION)) session_start();
     return view('not-found');
 })->name('not-found');
