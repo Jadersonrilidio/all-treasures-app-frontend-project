@@ -18,13 +18,17 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-Auth::routes();
+Route::get('/home', function () {
+    return view('home');
+})->name('home');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
 
-Route::get('/app', function () {
-    return view('app');
-})->name('app');
+Route::get('/register', function () {
+    return view('register');
+})->name('register');
 
 Route::fallback(function () {
     return view('not-found');

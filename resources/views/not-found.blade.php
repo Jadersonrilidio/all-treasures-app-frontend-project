@@ -18,17 +18,17 @@
                                 <a clas="" href="{{ route('login') }}">Login</a>
                             </li>
                             <li class="">
-                                <a clas="" href="{{route('welcome')}}/register">Register</a>
+                                <a clas="" href="{{ route('register') }}">Register</a>
                             </li>
                         </ul>
                     @endguest
 
                     @auth
-                        @if (session('status'))
-                            <div class="alert alert-success" role="alert">
-                                {{ session('status') }}
-                            </div>
-                        @endif
+                        <ul class="">
+                            <li class="">
+                                <a clas="" href="{{ route('home') }}">Home</a>
+                            </li>
+                        </ul>
                     @endauth
 
                 </div>
