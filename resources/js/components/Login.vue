@@ -7,7 +7,7 @@
 
                     <template v-slot:body>
 
-                        <form method="POST" :action="formAction" @submit.prevent="login($event)">
+                        <form method="POST" action="" @submit.prevent="login($event)">
 
                             <input type="hidden" name="_token" :value="csrf_token">
 
@@ -44,7 +44,6 @@
     export default {
         props: [
             'csrf_token',
-            'formAction'
         ],
         data() {
             return {
@@ -64,39 +63,24 @@
         },
         methods: {
             login(event) {
-                if (this.username && this.password) {
-                    userid.value = 4;
-                    event.target.submit();
+                let url = this.baseUrl + '/' + this.username;
+
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                    }
                 }
 
-                // let url = this.baseUrl + '/' + this.username;
-                
-                // let config = {
-                //     headers: {
-                //         'Accept': 'application/json',
-                //     }
-                // }
-                
-                // axios.get(url, config)
-                //     .then(response => {
-                //         if (response.data.password == this.password) {
-                //             document.getElementById('userid').value = response.data.id;
-                //             event.target.submit();
-                //         } else {
-                //             console.log(response);
-                //         }
-                //     })
-                //     .catch(errors => {
-                //         console.log(errors.response);
-                //     });
+                axios.get(url, config)
+                    .then(response => {
+                        userid.value = response.data.id;
+                        event.target.submit();
+                    })
+                    .catch(errors => {
+                        console.log(errors.response);
+                    });
             }
 
-        },
-        computed: {
-
-        },
-        mounted() {
-
-        },
+        }
     }
 </script>

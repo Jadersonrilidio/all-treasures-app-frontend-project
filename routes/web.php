@@ -13,26 +13,49 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    if (!isset($_SESSION)) session_start();
-    return view('welcome');
-})->name('welcome');
+Route::middleware('session.only')->group(function () {
 
-Route::middleware('guest.only')->get('/login', [App\Http\Controllers\LoginController::class, 'index'])->name('login.index');
-Route::middleware('guest.only')->post('/login', [App\Http\Controllers\LoginController::class, 'login'])->name('login.login');
-Route::middleware('auth.only')->post('/logout', [App\Http\Controllers\LoginController::class, 'logout'])->name('login.logout');
+    Route::get('/', function () {
+        return view('welcome');
+    })->name('welcome');
 
-Route::middleware('guest.only')->get('/register', function () {
-    if (!isset($_SESSION)) session_start();
-    return view('register');
-})->name('register');
+    Route::fallback(function () {
+        return view('not-found');
+    })->name('not-found');
+    
+    Route::middleware('guest.only')->group(function () {
 
-Route::middleware('auth.only')->get('/home', function () {
-    if (!isset($_SESSION)) session_start();
-    return view('home');
-})->name('home');
+        Route::get('/login', [App\Http\Controllers\LoginController::class, 'index'])->name('login.index');
 
-Route::fallback(function () {
-    if (!isset($_SESSION)) session_start();
-    return view('not-found');
-})->name('not-found');
+        Route::post('/login', [App\Http\Controllers\LoginController::class, 'login'])->name('login.login');
+
+        Route::get('/register', function () {
+            return view('register');
+        })->name('register');
+    });
+
+    Route::middleware('auth.only')->group(function () {
+
+        Route::post('/logout', [App\Http\Controllers\LoginController::class, 'logout'])->name('login.logout');
+
+        Route::get('/home', function () {
+            return view('home', $_SESSION);
+        })->name('home');
+
+        Route::get('/topic', function () {
+            return view('topic', $_SESSION);
+        })->name('topic');
+
+        Route::get('/stash', function () {
+            return view('stash', $_SESSION);
+        })->name('stash.index');
+
+        Route::get('/stash/{stashId}', function () {
+            return view('stash', $_SESSION);
+        })->name('stash.show');
+
+        Route::middleware('auth.only')->get('/artifact/{artifactId}', function () {
+            return view('artifact', $_SESSION);
+        })->name('artifact.show');
+    });
+});

@@ -65,5 +65,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'auth.only' => \App\Http\Middleware\SimpleAuthenticateMiddleware::class,
         'guest.only' => \App\Http\Middleware\SimpleRedirectIfAuthenticatedMiddleware::class,
+        'session.only' => \App\Http\Middleware\SessionStartMiddleware::class,
     ];
 }

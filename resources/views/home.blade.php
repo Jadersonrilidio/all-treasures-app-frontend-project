@@ -2,6 +2,6 @@
 
 @section('content')
 
-    <home-component></home-component>
+    <home-component username="{{ $name }}" userid={{ $id }}></home-component>
 
 @endsection

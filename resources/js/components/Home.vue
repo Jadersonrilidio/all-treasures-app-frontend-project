@@ -3,18 +3,15 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
 
-                <div class="card">
+                <card-component :title="cardTitle" :components="card.components">
+                    <template v-slot:body>
 
-                    <div class="card-header">
-                        Dashboard
-                    </div>
-    
-                    <div class="card-body">
-                        You are logged in!
-                    </div>
+                        <p>You are logged in!</p>
+                        <h1>Dashboard here</h1>
 
-                </div>
-                
+                    </template>
+                </card-component>
+
             </div>
         </div>
     </div>
@@ -22,17 +19,28 @@
 
 <script>
     export default {
-        props: [],
+        props: [
+            'username',
+            'userid'
+        ],
         data() {
             return {
-               
+               card: {
+                components: {
+                    header: true,
+                    body: true,
+                    footer: false
+                }
+               }
             }
         },
         methods: {
 
         },
         computed: {
-
+            cardTitle() {
+                return 'Welcome back, ' + this.username + '!';
+            }
         },
         mounted() {
 
