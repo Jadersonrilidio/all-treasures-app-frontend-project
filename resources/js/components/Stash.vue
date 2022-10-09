@@ -4,30 +4,29 @@
             <div class="col-md-8">
 
                 <card-component :title="card.title" :components="card.components">
-                    
-                    <template v-slot:body>
+                    <template v-slot:header>
+                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-toggle="modal" data-target="#addStashModal">Add Stash</button>
+                    </template>
 
+                    <template v-slot:body>
                         <stash-card-component v-for="stash, i in stashes" :key="i"
                             :stash="stash"
                         >
-
                         </stash-card-component>
-
-
-                        <!-- <pre>
-                            {{ stashes }}
-                        </pre> -->
-
                     </template>
 
                     <template v-slot:footer>
-                        <button type="submit" class="btn btn-primary btn-sm" style="float:right">Add Stash</button>
+                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-toggle="modal" data-target="#addStashModal">Add Stash</button>
                     </template>
-
                 </card-component>
 
             </div>
         </div>
+
+        <modal-component>
+            
+        </modal-component>
+
     </div>
 </template>
 
@@ -47,6 +46,7 @@
                         footer: true
                     }
                 },
+                // stashes: [],
                 stashes: [
                     {table_show: false, show: false, id: '1', user_id: '1', title: 'stash 01', topic: 'demo', description: 'collection of demo', artifacts: [
                     {id: '1', title: 'artifact 01', stash_id: '1', tags: ['demo']},

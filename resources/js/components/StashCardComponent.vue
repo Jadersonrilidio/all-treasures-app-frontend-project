@@ -26,52 +26,50 @@
         <div class="card-body" v-if="stash.show">
 
             <ul style="list-style:none">
-                <!-- <li v-for="column, attr in columns" :key="attr">
+                <li v-for="column, attr in columns" :key="attr">
                     <b>{{ column.title }}: </b>
-                    {{ stash.attr ?? 'not defined' }}
-                </li> -->
+                    {{ stash[attr] ?? 'not defined' }}
+                </li>
                 
-                <li><b>ID: </b> {{ stash.id ?? 'not defined' }} </li>
-                <li><b>User ID: </b> {{ stash.user_id ?? 'not defined' }} </li>
-                <li><b>Title: </b> {{ stash.title ?? 'not defined' }} </li>
-                <li><b>Related Topic: </b> {{ stash.topic ?? 'not defined' }} </li>
-                <li><b>Description: </b> {{ stash.description ?? 'not defined' }} </li>
-                <li><b>Artifacts: </b> {{ numberOfArtifacts(stash.artifacts) ?? 'not defined' }} </li>
+                <li>
+                    <b>Artifacts: </b>
+                    {{ numberOfArtifacts ?? 'not defined' }}
+                </li>
             </ul>
 
-            <div v-if="stash.table_show">
-                <div style="text-align:center; padding-bottom:10px">
-                    <button class="btn" style="background-color:lightgray; border:none; color:gray" @click.prevent="toggleArtifactsTable(stash)">
-                        &uarr;
-                        <br>
-                        Hide
-                    </button>
+            <div v-if="numberOfArtifacts > 0">
+                <div v-if="stash.table_show">
+                    <div style="text-align:center; padding-bottom:10px">
+                        <button class="btn" style="background-color:lightgray; border:none; color:gray" @click.prevent="toggleArtifactsTable()">
+                            &uarr;
+                            <br>
+                            Hide
+                        </button>
+                    </div>
+
+                    <table-component
+                        :columns="table_columns"
+                        :buttons="table_buttons"
+                        :items="artifacts"
+                    >
+                    </table-component>
                 </div>
 
-                <table-component
-                    :columns="table_columns"
-                    :buttons="table_buttons"
-                    :items="stash.artifacts"
-                >
-    
-                    <!-- <template v-slot:rows>
-                        <tr v-for="artifact, key in stash.artifacts" :key="key">
-                            <td v-for="value, attr in artifact" :key="attr">
-                                {{ value }}
-                            </td>
-                        </tr>
-                    </template> -->
-    
-                </table-component>
-
+                <div v-else>
+                    <div style="text-align:center; padding-bottom:10px">
+                        <button class="btn" style="background-color:lightgray; border:none; color:gray" @click.prevent="toggleArtifactsTable()">
+                            Show
+                            <br>
+                            &darr;
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div v-else>
                 <div style="text-align:center; padding-bottom:10px">
-                    <button class="btn" style="background-color:lightgray; border:none; color:gray" @click.prevent="toggleArtifactsTable(stash)">
-                        Show
-                        <br>
-                        &darr;
+                    <button class="btn" style="background-color:lightgray; border:none; color:gray" disabled>
+                        No artifacts to show
                     </button>
                 </div>
             </div>
@@ -95,6 +93,7 @@
         ],
         data() {
             return {
+                artifacts: [],
                 buttons: {
                     view: {
                         title: 'View',
@@ -130,9 +129,6 @@
                     },
                     description: {
                         title: 'Description'
-                    },
-                    artifacts: {
-                        title: 'Artifacts'
                     }
                 },
                 table_columns: {
@@ -154,15 +150,45 @@
             }
         },
         methods: {
-            numberOfArtifacts(artifacts) {
-                return artifacts ? artifacts.length : 0;
+            getStashArtifacts() {
+                this.artifacts = this.stash.artifacts;
+
+                // let url = 'http://alltreasures.herokuapp.com/artifact/all-artifacts/stash_id=' + this.stash.id;
+
+                // let config = {
+                //     headers: {
+                //         'Accept': 'application/json'
+                //     }
+                // };
+
+                // axios.get(url, config)
+                //     .then(response => {
+                //         this.artifacts = response.data;
+                //         console.log(response);
+                //     })
+                //     .catch(errors => {
+                //         console.log(errors.response);
+                //     })
             },
-            toggleCardBody(stash) {
-                stash.show = stash.show ? false : true;
+            setStashAttributes() {
+                this.stash['show'] = false;
+                this.stash['table_show'] = false;
             },
-            toggleArtifactsTable(stash) {
-                stash.table_show = stash.table_show ? false : true;
+            toggleCardBody() {
+                this.stash.show = this.stash.show ? false : true;
+            },
+            toggleArtifactsTable() {
+                this.stash.table_show = this.stash.table_show ? false : true;
             }
+        },
+        computed: {
+            numberOfArtifacts() {
+                return this.artifacts ? this.artifacts.length : 0;
+            }
+        },
+        mounted() {
+            this.getStashArtifacts();
+            this.setStashAttributes();
         }
     }
 </script>
