@@ -31,6 +31,7 @@ Vue.component('card-component', require('./components/CardComponent.vue').defaul
 Vue.component('input-component', require('./components/InputComponent.vue').default);
 Vue.component('table-component', require('./components/TableComponent.vue').default);
 Vue.component('modal-component', require('./components/ModalComponent.vue').default);
+Vue.component('alert-component', require('./components/AlertComponent.vue').default);
 
 Vue.component('stash-card-component', require('./components/StashCardComponent.vue').default);
 

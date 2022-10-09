@@ -5,7 +5,7 @@
 
                 <card-component :title="card.title" :components="card.components">
                     <template v-slot:header>
-                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-toggle="modal" data-target="#addStashModal">Add Stash</button>
+                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-toggle="modal" :data-target="'#'+modalAdd.id">Add Stash</button>
                     </template>
 
                     <template v-slot:body>
@@ -16,15 +16,44 @@
                     </template>
 
                     <template v-slot:footer>
-                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-toggle="modal" data-target="#addStashModal">Add Stash</button>
+                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-toggle="modal" :data-target="'#'+modalAdd.id">Add Stash</button>
                     </template>
                 </card-component>
 
             </div>
         </div>
 
-        <modal-component>
+        <modal-component :id="modalAdd.id" :title="modalAdd.title">
+            <template v-slot:alerts>
+                <alert-component>
+
+                </alert-component>
+            </template>
+
+            <template v-slot:content>
+                <input-component classes="row mb-3" id="stashTitle" title="Title">
+                    <input id="stashTitle" type="text" name="stashTitle" class="form-control" required autofocus v-model="stashTitle">
+                </input-component>
+        
+                <input-component classes="row mb-3" id="stashTopic" title="Topic">
+                    <select name="stashTopic" id="">
+                        <option value="" selected> Select a topic: </option>
+                        <option :value="topic.id" v-for="topic, key in topics" :key="key">
+                            {{ topic.title }}
+                        </option>
+                    </select>
+                    <input id="stashTopic" type="number" name="stashTopic" class="form-control" required autofocus v-model="stashTopic">
+                </input-component>
+
+                <input-component classes="row mb-3" id="stashDescription" title="description">
+                    <input id="stashDescription" type="text" name="stashDescription" class="form-control" required autofocus v-model="stashDescription">
+                </input-component>
+            </template>
             
+            <template v-slot:footer>
+                <button type="submit" class="btn btn-secondary btn-sm" style="float:right" data-dismiss="modal" @click="cleanNewStashData()">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm" style="float:right" @click="addStash()">Add</button>
+            </template>
         </modal-component>
 
     </div>
@@ -38,6 +67,11 @@
         ],
         data() {
             return {
+                // stashes: [],
+                topics: [],
+                stashTitle: '',
+                stashTopic: '',
+                stashDescription: '',
                 card: {
                     title: 'Your Stashes',
                     components: {
@@ -46,7 +80,10 @@
                         footer: true
                     }
                 },
-                // stashes: [],
+                modalAdd: {
+                    id: 'addStashModal',
+                    title: 'Add New Stash'
+                },
                 stashes: [
                     {table_show: false, show: false, id: '1', user_id: '1', title: 'stash 01', topic: 'demo', description: 'collection of demo', artifacts: [
                     {id: '1', title: 'artifact 01', stash_id: '1', tags: ['demo']},
@@ -75,7 +112,7 @@
         },
         methods: {
             // loadStashes() {
-            //     let url = 'http://alltreasures.herokuapp.com/stashes/all-stashes/' + this.userid;
+            //     let url = 'http://alltreasures.herokuapp.com' + '/stashes/all-stashes/' + this.userid;
 
             //     let config = {
             //         headers: {
@@ -91,10 +128,59 @@
             //         .catch(errors => {
             //             console.log(errors);
             //         });
-            // }
+            // },
+            loadTopics() {
+                let url = 'http://alltreasures.herokuapp.com' + '/topic/all-topics';
+
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                }
+
+                axios.get(url, config)
+                    .then(response => {
+                        console.log(response);
+                        this.topics = response.data;
+                    })
+                    .catch(errors => {
+                        console.log(errrors);
+                    });
+            },
+            cleanNewStashData() {
+                this.stashTitle = '',
+                this.stashTopic = '',
+                this.stashDescription = ''
+            },
+            addStash() {
+                let url = 'http://alltreasures.herokuapp.com' + '/stash/create';
+
+                let formData = new FormData();
+                formData.append('user_id', this.userid);
+                formData.append('title', this.stashTitle);
+                formData.append('topic', this.stashTopic);
+                formData.append('description', this.stashDescription);
+
+                let config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                };
+
+                axios.post(url, formData, config)
+                    .then(response => {
+                        console.log(response);
+                        //Alert signals
+                    })
+                    .catch(errors => {
+                        console.log(errors.response);
+                    })
+            }
         },
         mounted() {
             // this.loadStashes();
+            this.loadTopics();
         },
     }
 </script>
