@@ -5449,7 +5449,44 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: []
+  props: ['csrf_token', 'routeLogin'],
+  data: function data() {
+    return {
+      baseUrl: 'https://alltreasures.herokuapp.com/user/signup',
+      username: '',
+      password: '',
+      password_confirm: '',
+      card: {
+        title: 'Register',
+        components: {
+          header: true,
+          body: true,
+          footer: false
+        }
+      }
+    };
+  },
+  methods: {
+    register: function register(event) {
+      if (this.password != this.password_confirm) return;
+      var formData = new FormData();
+      formData.append('username', this.username);
+      formData.append('password', this.password);
+      formData.append('password_confirm', this.password_confirm);
+      var config = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      };
+      axios.post(this.baseUrl, formData, config).then(function (response) {
+        console.log(response);
+        event.target.submit();
+      })["catch"](function (errors) {
+        console.log(errors.response);
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -6062,116 +6099,146 @@ var render = function render() {
   var _vm = this,
       _c = _vm._self._c;
 
-  return _vm._m(0);
-};
-
-var staticRenderFns = [function () {
-  var _vm = this,
-      _c = _vm._self._c;
-
   return _c("div", {
     staticClass: "container"
   }, [_c("div", {
     staticClass: "row justify-content-center"
   }, [_c("div", {
     staticClass: "col-md-8"
-  }, [_c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-header"
-  }, [_vm._v(" Register ")]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
-  }, [_c("form", {
+  }, [_c("card-component", {
     attrs: {
-      method: "POST",
-      action: "#"
-    }
-  }, [_c("div", {
-    staticClass: "row mb-3"
-  }, [_c("label", {
-    staticClass: "col-md-4 col-form-label text-md-end",
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v(" Name ")]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      id: "name",
-      type: "text",
-      name: "name",
-      value: "",
-      required: "",
-      autocomplete: "name",
-      autofocus: ""
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row mb-3"
-  }, [_c("label", {
-    staticClass: "col-md-4 col-form-label text-md-end",
-    attrs: {
-      "for": "email"
-    }
-  }, [_vm._v(" Email Address ")]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      id: "email",
-      type: "email",
-      name: "email",
-      value: "",
-      required: "",
-      autocomplete: "email"
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row mb-3"
-  }, [_c("label", {
-    staticClass: "col-md-4 col-form-label text-md-end",
-    attrs: {
-      "for": "password"
-    }
-  }, [_vm._v(" Password ")]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      id: "password",
-      type: "password",
-      name: "password",
-      required: "",
-      autocomplete: "new-password"
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row mb-3"
-  }, [_c("label", {
-    staticClass: "col-md-4 col-form-label text-md-end",
-    attrs: {
-      "for": "password-confirm"
-    }
-  }, [_vm._v(" Confirm Password ")]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6"
-  }, [_c("input", {
-    staticClass: "form-control",
-    attrs: {
-      id: "password-confirm",
-      type: "password",
-      name: "password_confirmation",
-      required: "",
-      autocomplete: "new-password"
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "row mb-0"
-  }, [_c("div", {
-    staticClass: "col-md-6 offset-md-4"
-  }, [_c("button", {
-    staticClass: "btn btn-primary",
-    attrs: {
-      type: "submit"
-    }
-  }, [_vm._v("\n                                    Register\n                                ")])])])])])])])])]);
-}];
+      title: _vm.card.title,
+      components: _vm.card.components
+    },
+    scopedSlots: _vm._u([{
+      key: "body",
+      fn: function fn() {
+        return [_c("form", {
+          attrs: {
+            method: "POST",
+            action: _vm.routeLogin
+          },
+          on: {
+            submit: function submit($event) {
+              $event.preventDefault();
+              return _vm.register($event);
+            }
+          }
+        }, [_c("input", {
+          attrs: {
+            type: "hidden",
+            name: "_token"
+          },
+          domProps: {
+            value: _vm.csrf_token
+          }
+        }), _vm._v(" "), _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "username",
+            title: "Username"
+          }
+        }, [_c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.username,
+            expression: "username"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            id: "username",
+            type: "text",
+            name: "username",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.username
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+              _vm.username = $event.target.value;
+            }
+          }
+        })]), _vm._v(" "), _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "password",
+            title: "Password"
+          }
+        }, [_c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.password,
+            expression: "password"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            id: "password",
+            type: "password",
+            name: "password",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.password
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+              _vm.password = $event.target.value;
+            }
+          }
+        })]), _vm._v(" "), _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "password_confirm",
+            title: "Confirm Password"
+          }
+        }, [_c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.password_confirm,
+            expression: "password_confirm"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            id: "password_confirm",
+            type: "password",
+            name: "password_confirm",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.password_confirm
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+              _vm.password_confirm = $event.target.value;
+            }
+          }
+        })]), _vm._v(" "), _c("div", {
+          staticClass: "row mb-0"
+        }, [_c("div", {
+          staticClass: "col-md-6 offset-md-4"
+        }, [_c("button", {
+          staticClass: "btn btn-primary",
+          attrs: {
+            type: "submit"
+          }
+        }, [_vm._v("\n                                    Register\n                                ")])])])], 1)];
+      },
+      proxy: true
+    }])
+  })], 1)])]);
+};
+
+var staticRenderFns = [];
 render._withStripped = true;
 
 
@@ -6301,32 +6368,55 @@ var render = function render() {
     staticStyle: {
       "list-style": "none"
     }
-  }, [_c("li", [_c("b", [_vm._v("ID: ")]), _vm._v(" " + _vm._s((_vm$stash$id = _vm.stash.id) !== null && _vm$stash$id !== void 0 ? _vm$stash$id : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("User ID: ")]), _vm._v(" " + _vm._s((_vm$stash$user_id = _vm.stash.user_id) !== null && _vm$stash$user_id !== void 0 ? _vm$stash$user_id : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("Title: ")]), _vm._v(" " + _vm._s((_vm$stash$title = _vm.stash.title) !== null && _vm$stash$title !== void 0 ? _vm$stash$title : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("Related Topic: ")]), _vm._v(" " + _vm._s((_vm$stash$topic = _vm.stash.topic) !== null && _vm$stash$topic !== void 0 ? _vm$stash$topic : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("Description: ")]), _vm._v(" " + _vm._s((_vm$stash$description = _vm.stash.description) !== null && _vm$stash$description !== void 0 ? _vm$stash$description : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("Artifacts: ")]), _vm._v(" " + _vm._s((_vm$numberOfArtifacts = _vm.numberOfArtifacts(_vm.stash.artifacts)) !== null && _vm$numberOfArtifacts !== void 0 ? _vm$numberOfArtifacts : "not defined") + " ")])]), _vm._v(" "), _vm.stash.table_show ? _c("div", [_c("div", {}, [_c("button", {
-    staticClass: "btn btn-sm btn-secondary",
+  }, [_c("li", [_c("b", [_vm._v("ID: ")]), _vm._v(" " + _vm._s((_vm$stash$id = _vm.stash.id) !== null && _vm$stash$id !== void 0 ? _vm$stash$id : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("User ID: ")]), _vm._v(" " + _vm._s((_vm$stash$user_id = _vm.stash.user_id) !== null && _vm$stash$user_id !== void 0 ? _vm$stash$user_id : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("Title: ")]), _vm._v(" " + _vm._s((_vm$stash$title = _vm.stash.title) !== null && _vm$stash$title !== void 0 ? _vm$stash$title : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("Related Topic: ")]), _vm._v(" " + _vm._s((_vm$stash$topic = _vm.stash.topic) !== null && _vm$stash$topic !== void 0 ? _vm$stash$topic : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("Description: ")]), _vm._v(" " + _vm._s((_vm$stash$description = _vm.stash.description) !== null && _vm$stash$description !== void 0 ? _vm$stash$description : "not defined") + " ")]), _vm._v(" "), _c("li", [_c("b", [_vm._v("Artifacts: ")]), _vm._v(" " + _vm._s((_vm$numberOfArtifacts = _vm.numberOfArtifacts(_vm.stash.artifacts)) !== null && _vm$numberOfArtifacts !== void 0 ? _vm$numberOfArtifacts : "not defined") + " ")])]), _vm._v(" "), _vm.stash.table_show ? _c("div", [_c("div", {
+    staticStyle: {
+      "text-align": "center",
+      "padding-bottom": "10px"
+    }
+  }, [_c("button", {
+    staticClass: "btn",
+    staticStyle: {
+      "background-color": "lightgray",
+      border: "none",
+      color: "gray"
+    },
     on: {
       click: function click($event) {
         $event.preventDefault();
         return _vm.toggleArtifactsTable(_vm.stash);
       }
     }
-  }, [_vm._v("\n                    Hide Artifacts\n                ")])]), _vm._v(" "), _c("table-component", {
+  }, [_vm._v("\n                    ↑\n                    "), _c("br"), _vm._v("\n                    Hide\n                ")])]), _vm._v(" "), _c("table-component", {
     attrs: {
       columns: _vm.table_columns,
       buttons: _vm.table_buttons,
       items: _vm.stash.artifacts
     }
-  })], 1) : _c("div", [_c("div", {}, [_c("button", {
-    staticClass: "btn btn-sm btn-secondary",
+  })], 1) : _c("div", [_c("div", {
+    staticStyle: {
+      "text-align": "center",
+      "padding-bottom": "10px"
+    }
+  }, [_c("button", {
+    staticClass: "btn",
+    staticStyle: {
+      "background-color": "lightgray",
+      border: "none",
+      color: "gray"
+    },
     on: {
       click: function click($event) {
         $event.preventDefault();
         return _vm.toggleArtifactsTable(_vm.stash);
       }
     }
-  }, [_vm._v("\n                    Show Artifacts\n                ")])])])]) : _vm._e(), _vm._v(" "), _vm.stash.show ? _c("div", {
+  }, [_vm._v("\n                    Show\n                    "), _c("br"), _vm._v("\n                    ↓\n                ")])])])]) : _vm._e(), _vm._v(" "), _vm.stash.show ? _c("div", {
     staticClass: "card-footer"
   }, [_c("button", {
     staticClass: "btn btn-sm btn-primary",
+    staticStyle: {
+      "float": "right"
+    },
     attrs: {
       "data-bs-toggle": "modal",
       "data-bs-target": "#addArtifactModal"

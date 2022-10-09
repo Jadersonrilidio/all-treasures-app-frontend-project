@@ -2,54 +2,41 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header"> Register </div>
-    
-                    <div class="card-body">
-                        <form method="POST" action="#">
-    
-                            <div class="row mb-3">
-                                <label for="name" class="col-md-4 col-form-label text-md-end"> Name </label>
-    
-                                <div class="col-md-6">
-                                    <input id="name" type="text" class="form-control" name="name" value="" required autocomplete="name" autofocus>
-                                </div>
-                            </div>
-    
-                            <div class="row mb-3">
-                                <label for="email" class="col-md-4 col-form-label text-md-end"> Email Address </label>
-    
-                                <div class="col-md-6">
-                                    <input id="email" type="email" class="form-control" name="email" value="" required autocomplete="email">
-                                </div>
-                            </div>
-    
-                            <div class="row mb-3">
-                                <label for="password" class="col-md-4 col-form-label text-md-end"> Password </label>
-    
-                                <div class="col-md-6">
-                                    <input id="password" type="password" class="form-control" name="password" required autocomplete="new-password">
-                                </div>
-                            </div>
-    
-                            <div class="row mb-3">
-                                <label for="password-confirm" class="col-md-4 col-form-label text-md-end"> Confirm Password </label>
-    
-                                <div class="col-md-6">
-                                    <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                                </div>
-                            </div>
-    
-                            <div class="row mb-0">
+
+                <card-component :title="card.title" :components="card.components">
+
+                    <template v-slot:body>
+
+                        <form method="POST" :action="routeLogin" @submit.prevent="register($event)">
+
+                            <input type="hidden" name="_token" :value="csrf_token">
+
+                            <input-component classes="row mb-3" id="username" title="Username">
+                                <input id="username" type="text" name="username" class="form-control" required autofocus v-model="username">
+                            </input-component>
+
+                            <input-component classes="row mb-3" id="password" title="Password">
+                                <input id="password" type="password" name="password" class="form-control" required autofocus v-model="password">
+                            </input-component>
+
+                            <input-component classes="row mb-3" id="password_confirm" title="Confirm Password">
+                                <input id="password_confirm" type="password" name="password_confirm" class="form-control" required autofocus v-model="password_confirm">
+                            </input-component>
+                            
+                                <div class="row mb-0">
                                 <div class="col-md-6 offset-md-4">
                                     <button type="submit" class="btn btn-primary">
                                         Register
                                     </button>
                                 </div>
                             </div>
+
                         </form>
-                    </div>
-                </div>
+
+                    </template>
+
+                </card-component>
+
             </div>
         </div>
     </div>
@@ -57,6 +44,51 @@
 
 <script>
     export default {
-        props: [],
+        props: [
+            'csrf_token',
+            'routeLogin'
+        ],
+        data() {
+            return {
+                baseUrl: 'https://alltreasures.herokuapp.com/user/signup',
+                username: '',
+                password: '',
+                password_confirm: '',
+                card: {
+                    title: 'Register',
+                    components: {
+                        header: true,
+                        body: true,
+                        footer: false
+                    }
+                }
+            }
+        },
+        methods: {
+            register(event) {
+                if (this.password != this.password_confirm) return;
+
+                let formData = new FormData();
+                formData.append('username', this.username);
+                formData.append('password', this.password);
+                formData.append('password_confirm', this.password_confirm);
+
+                let config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                };
+
+                axios.post(this.baseUrl, formData, config)
+                    .then(response => {
+                        console.log(response);
+                        event.target.submit();
+                    })
+                    .catch(errors => {
+                        console.log(errors.response);
+                    });
+            }
+        }
     }
 </script>

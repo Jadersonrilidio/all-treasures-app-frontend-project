@@ -40,9 +40,11 @@
             </ul>
 
             <div v-if="stash.table_show">
-                <div class="">
-                    <button class="btn btn-sm btn-secondary" @click.prevent="toggleArtifactsTable(stash)">
-                        Hide Artifacts
+                <div style="text-align:center; padding-bottom:10px">
+                    <button class="btn" style="background-color:lightgray; border:none; color:gray" @click.prevent="toggleArtifactsTable(stash)">
+                        &uarr;
+                        <br>
+                        Hide
                     </button>
                 </div>
 
@@ -65,9 +67,11 @@
             </div>
 
             <div v-else>
-                <div class="">
-                    <button class="btn btn-sm btn-secondary" @click.prevent="toggleArtifactsTable(stash)">
-                        Show Artifacts
+                <div style="text-align:center; padding-bottom:10px">
+                    <button class="btn" style="background-color:lightgray; border:none; color:gray" @click.prevent="toggleArtifactsTable(stash)">
+                        Show
+                        <br>
+                        &darr;
                     </button>
                 </div>
             </div>
@@ -76,7 +80,7 @@
 
         <div class="card-footer" v-if="stash.show">
             <!-- Button trigger modal // ADD_ARTIFACT_MODAL -->
-            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addArtifactModal">
+            <button class="btn btn-sm btn-primary" style="float:right" data-bs-toggle="modal" data-bs-target="#addArtifactModal">
                 Add New Artifact
             </button>
         </div>
