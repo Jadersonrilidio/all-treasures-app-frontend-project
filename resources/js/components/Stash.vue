@@ -5,7 +5,7 @@
 
                 <card-component :title="card.title" :components="card.components">
                     <template v-slot:header>
-                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-toggle="modal" :data-target="'#'+modalAdd.id">Add Stash</button>
+                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-bs-toggle="modal" :data-bs-target="'#'+modalAdd.id">Add Stash</button>
                     </template>
 
                     <template v-slot:body>
@@ -16,7 +16,7 @@
                     </template>
 
                     <template v-slot:footer>
-                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-toggle="modal" :data-target="'#'+modalAdd.id">Add Stash</button>
+                        <button type="submit" class="btn btn-primary btn-sm" style="float:right" data-bs-toggle="modal" :data-bs-target="'#'+modalAdd.id">Add Stash</button>
                     </template>
                 </card-component>
 
@@ -38,11 +38,12 @@
                 <input-component classes="row mb-3" id="stashTopic" title="Topic">
                     <select name="stashTopic" id="">
                         <option value="" selected> Select a topic: </option>
+                        <option value="1"> random topic 01 </option>
+                        <option value="2"> random topic 02 </option>
                         <option :value="topic.id" v-for="topic, key in topics" :key="key">
-                            {{ topic.title }}
+                            {{ topic.id }} - {{ topic.title }}
                         </option>
                     </select>
-                    <input id="stashTopic" type="number" name="stashTopic" class="form-control" required autofocus v-model="stashTopic">
                 </input-component>
 
                 <input-component classes="row mb-3" id="stashDescription" title="description">
@@ -51,8 +52,8 @@
             </template>
             
             <template v-slot:footer>
-                <button type="submit" class="btn btn-secondary btn-sm" style="float:right" data-dismiss="modal" @click="cleanNewStashData()">Cancel</button>
-                <button type="submit" class="btn btn-primary btn-sm" style="float:right" @click="addStash()">Add</button>
+                <button type="submit" class="btn btn-secondary" style="float:right" data-bs-dismiss="modal" @click="cleanNewStashData()">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="float:right" @click="addStash()">Add</button>
             </template>
         </modal-component>
 

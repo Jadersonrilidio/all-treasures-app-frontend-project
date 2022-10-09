@@ -6462,8 +6462,8 @@ var render = function render() {
           },
           attrs: {
             type: "submit",
-            "data-toggle": "modal",
-            "data-target": "#" + _vm.modalAdd.id
+            "data-bs-toggle": "modal",
+            "data-bs-target": "#" + _vm.modalAdd.id
           }
         }, [_vm._v("Add Stash")])];
       },
@@ -6491,8 +6491,8 @@ var render = function render() {
           },
           attrs: {
             type: "submit",
-            "data-toggle": "modal",
-            "data-target": "#" + _vm.modalAdd.id
+            "data-bs-toggle": "modal",
+            "data-bs-target": "#" + _vm.modalAdd.id
           }
         }, [_vm._v("Add Stash")])];
       },
@@ -6558,38 +6558,22 @@ var render = function render() {
             value: "",
             selected: ""
           }
-        }, [_vm._v(" Select a topic: ")]), _vm._v(" "), _vm._l(_vm.topics, function (topic, key) {
+        }, [_vm._v(" Select a topic: ")]), _vm._v(" "), _c("option", {
+          attrs: {
+            value: "1"
+          }
+        }, [_vm._v(" random topic 01 ")]), _vm._v(" "), _c("option", {
+          attrs: {
+            value: "2"
+          }
+        }, [_vm._v(" random topic 02 ")]), _vm._v(" "), _vm._l(_vm.topics, function (topic, key) {
           return _c("option", {
             key: key,
             domProps: {
               value: topic.id
             }
-          }, [_vm._v("\n                        " + _vm._s(topic.title) + "\n                    ")]);
-        })], 2), _vm._v(" "), _c("input", {
-          directives: [{
-            name: "model",
-            rawName: "v-model",
-            value: _vm.stashTopic,
-            expression: "stashTopic"
-          }],
-          staticClass: "form-control",
-          attrs: {
-            id: "stashTopic",
-            type: "number",
-            name: "stashTopic",
-            required: "",
-            autofocus: ""
-          },
-          domProps: {
-            value: _vm.stashTopic
-          },
-          on: {
-            input: function input($event) {
-              if ($event.target.composing) return;
-              _vm.stashTopic = $event.target.value;
-            }
-          }
-        })]), _vm._v(" "), _c("input-component", {
+          }, [_vm._v("\n                        " + _vm._s(topic.id) + " - " + _vm._s(topic.title) + "\n                    ")]);
+        })], 2)]), _vm._v(" "), _c("input-component", {
           attrs: {
             classes: "row mb-3",
             id: "stashDescription",
@@ -6626,13 +6610,13 @@ var render = function render() {
       key: "footer",
       fn: function fn() {
         return [_c("button", {
-          staticClass: "btn btn-secondary btn-sm",
+          staticClass: "btn btn-secondary",
           staticStyle: {
             "float": "right"
           },
           attrs: {
             type: "submit",
-            "data-dismiss": "modal"
+            "data-bs-dismiss": "modal"
           },
           on: {
             click: function click($event) {
@@ -6640,7 +6624,7 @@ var render = function render() {
             }
           }
         }, [_vm._v("Cancel")]), _vm._v(" "), _c("button", {
-          staticClass: "btn btn-primary btn-sm",
+          staticClass: "btn btn-primary",
           staticStyle: {
             "float": "right"
           },
