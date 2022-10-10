@@ -9,6 +9,29 @@ require('./bootstrap');
 window.Vue = require('vue').default;
 
 /**
+ * Importing and configuring vuex modules
+ */
+
+import Vuex from 'vuex';
+
+Vue.use(Vuex);
+
+const store = new Vuex.Store(
+    {
+        state: {
+            test: 'STORE IS OKAY!',
+            item: {},
+            transaction: {
+                status: '',
+                message: '',
+                errors: [],
+                object: {},
+            }
+        }
+    }
+);
+
+/**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
  * components and automatically register them with their "basename".
@@ -41,6 +64,19 @@ Vue.component('stash-card-component', require('./components/StashCardComponent.v
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+// Vue.filter('globalFormatDateTime', datetime => {
+//     if (!Date.parse(datetime))
+//         return datetime;
+//     datetime = datetime.split('T');
+//     let date = datetime[0];
+//     date = date.split('-');
+//     date = date[1] + '/' + date[2] + '/' + date[0]
+//     let time = datetime[1];
+//     time = time.split('.')[0];
+//     return date + ' - ' + time;
+// });
+
 const app = new Vue({
     el: '#app',
+    store
 });

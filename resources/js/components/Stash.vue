@@ -171,7 +171,6 @@
                         this.alert.status = 'success';
                         this.alert.object = response.data;
                         this.loadStashes();
-                        this.cleanNewStashData();
                         console.log(response);
                     })
                     .catch(errors => {

@@ -6,7 +6,6 @@
                 <card-component :title="card.title" :components="card.components">
                     
                     <template v-slot:body>
-
                         <table-component
                             :columns="table_columns"
                             :buttons="table_buttons"
@@ -54,7 +53,7 @@
 
             <template v-slot:content>
                 <input-component classes="row mb-3" id="topicTitle" title="Title">
-                    <input id="topicTitle" type="text" class="form-control" required autofocus> <!-- //todo v-model="$store.state.item.title"  -->
+                    <input id="topicTitle" type="text" class="form-control" required autofocus v-model="$store.state.item.title" v-if="$store.state.item.title">
                 </input-component>
             </template>
             
@@ -67,15 +66,20 @@
 
         <!-- start modal DELETE_TOPIC_MODAL -->
         <modal-component :id="modalDelete.id" :title="modalDelete.title">
+            <template v-slot:alerts>
+                <alert-component :details="alert">
+                </alert-component>
+            </template>
+
             <template v-slot:content>
-                <input-component classes="row mb-3" id="topicTitle" title="Title">
-                    <input id="topicTitle" type="text" class="form-control" disabled value="$store.state.item.title">
+                <input-component classes="row mb-3" title="Title" v-if="!alert.status">
+                    <input type="text" class="form-control" disabled :value="$store.state.item.title" v-if="$store.state.item.title">
                 </input-component>
             </template>
             
             <template v-slot:footer>
                 <button class="btn btn-secondary" style="float:right" data-bs-dismiss="modal">Close</button>
-                <button class="btn btn-danger" style="float:right" @click="deleteTopic()">Delete</button>
+                <button class="btn btn-danger" style="float:right" @click="deleteTopic()" v-if="!alert.status">Delete</button>
             </template>
         </modal-component>
         <!-- end modal DELETE_TOPIC_MODAL -->
@@ -166,7 +170,7 @@
                 let config = {
                     headers: {
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'multipart/form-data'
                     }
                 }
 
@@ -186,15 +190,15 @@
                     })
             },
             updateTopic() {
-                let url = this.baseUrl + $store.state.item.id;
+                let url = this.baseUrl + '/topic/' + this.$store.state.item.id;
 
                 let formData = new FormData();
-                formData.append('title', $store.state.item.title);
+                formData.append('title', this.$store.state.item.title);
 
                 let config = {
                     headers: {
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'multipart/form-data'
                     }
                 }
 
@@ -204,7 +208,6 @@
                         this.alert.status = 'success';
                         this.alert.object = response.data;
                         this.loadTopics();
-                        this.cleanNewTopicData();
                     })
                     .catch(errors => {
                         console.log(errors.response);
@@ -212,6 +215,26 @@
                         this.alert.message = errors.response.message;
                         this.alert.errors = errors.response.errors;
                     })
+            },
+            deleteTopic() {
+                let url = this.baseUrl + '/topic/' + this.$store.state.item.id;
+
+                let config = {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }
+
+                axios.delete(url, config)
+                    .then(response => {
+                        this.alert.status = 'success';
+                        // this.alert.object = response.data.content;
+                        this.loadTopics();
+                        console.log(response);
+                    })
+                    .catch(errors => {
+                        console.log(errors.response);
+                    });
             },
             cleanNewTopicData() {
                 this.topicTitle = '';

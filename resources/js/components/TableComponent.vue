@@ -19,7 +19,7 @@
                 </td>
                 
                 <td v-for="button, k in buttons" :key="k">
-                    <a class="btn btn-sm" :class="'btn-outline-'+button.class" data-bs-toggle="modal" :data-bs-target="button.target">
+                    <a class="btn btn-sm" :class="'btn-outline-'+button.class" data-bs-toggle="modal" :data-bs-target="button.target" @click="storeItem(item)">
                         {{ button.title }}
                     </a>
                 </td>
@@ -37,5 +37,10 @@
             'buttons',
             'items',
         ],
+        methods: {
+            storeItem(item) {
+                this.$store.state.item = item;
+            }
+        }
     }
 </script>
