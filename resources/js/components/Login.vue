@@ -47,7 +47,7 @@
         ],
         data() {
             return {
-                baseUrl: 'https://alltreasures.herokuapp.com/user',
+                baseUrl: 'https://alltreasures.herokuapp.com',
                 userid: '',
                 username: '',
                 password: '',
@@ -63,7 +63,7 @@
         },
         methods: {
             login(event) {
-                let url = this.baseUrl + '/' + this.username;
+                let url = this.baseUrl + '/user/' + this.username;
 
                 let config = {
                     headers: {

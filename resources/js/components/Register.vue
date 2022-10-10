@@ -50,7 +50,7 @@
         ],
         data() {
             return {
-                baseUrl: 'https://alltreasures.herokuapp.com/user/signup',
+                baseUrl: 'https://alltreasures.herokuapp.com',
                 username: '',
                 password: '',
                 password_confirm: '',
@@ -68,6 +68,8 @@
             register(event) {
                 if (this.password != this.password_confirm) return;
 
+                let url = this.baseUrl + '/user/signup';
+
                 let formData = new FormData();
                 formData.append('username', this.username);
                 formData.append('password', this.password);
@@ -80,7 +82,7 @@
                     }
                 };
 
-                axios.post(this.baseUrl, formData, config)
+                axios.post(url, formData, config)
                     .then(response => {
                         console.log(response);
                         event.target.submit();

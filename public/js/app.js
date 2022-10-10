@@ -5420,7 +5420,7 @@ __webpack_require__.r(__webpack_exports__);
   props: ['csrf_token'],
   data: function data() {
     return {
-      baseUrl: 'https://alltreasures.herokuapp.com/user',
+      baseUrl: 'https://alltreasures.herokuapp.com',
       userid: '',
       username: '',
       password: '',
@@ -5436,7 +5436,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     login: function login(event) {
-      var url = this.baseUrl + '/' + this.username;
+      var url = this.baseUrl + '/user/' + this.username;
       var config = {
         headers: {
           'Accept': 'application/json'
@@ -5486,7 +5486,7 @@ __webpack_require__.r(__webpack_exports__);
   props: ['csrf_token', 'routeLogin'],
   data: function data() {
     return {
-      baseUrl: 'https://alltreasures.herokuapp.com/user/signup',
+      baseUrl: 'https://alltreasures.herokuapp.com',
       username: '',
       password: '',
       password_confirm: '',
@@ -5503,6 +5503,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     register: function register(event) {
       if (this.password != this.password_confirm) return;
+      var url = this.baseUrl + '/user/signup';
       var formData = new FormData();
       formData.append('username', this.username);
       formData.append('password', this.password);
@@ -5513,7 +5514,7 @@ __webpack_require__.r(__webpack_exports__);
           'Accept': 'application/json'
         }
       };
-      axios.post(this.baseUrl, formData, config).then(function (response) {
+      axios.post(url, formData, config).then(function (response) {
         console.log(response);
         event.target.submit();
       })["catch"](function (errors) {

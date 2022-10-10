@@ -19,6 +19,10 @@ Route::middleware('session.only')->group(function () {
         return view('welcome');
     })->name('welcome');
 
+    Route::get('/about', function () {
+        return view('about');
+    })->name('about');
+
     Route::fallback(function () {
         return view('not-found');
     })->name('not-found');
