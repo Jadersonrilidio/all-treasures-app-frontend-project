@@ -11,6 +11,8 @@
 
                             <input type="hidden" name="_token" :value="csrf_token">
 
+                            <input type="hidden" name="userid" v-model="userid">
+
                             <input-component classes="row mb-3" id="username" title="Username">
                                 <input id="username" type="text" name="username" class="form-control" required autofocus v-model="username">
                             </input-component>
@@ -51,6 +53,7 @@
         data() {
             return {
                 baseUrl: 'https://alltreasures.herokuapp.com',
+                userid: '',
                 username: '',
                 password: '',
                 password_confirm: '',
@@ -85,6 +88,8 @@
                 axios.post(url, formData, config)
                     .then(response => {
                         console.log(response);
+                        this.userid = response.data.userId;
+                        this.username = response.data.username;
                         event.target.submit();
                     })
                     .catch(errors => {

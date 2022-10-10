@@ -25,29 +25,26 @@
 
         <modal-component :id="modalAdd.id" :title="modalAdd.title">
             <template v-slot:alerts>
-                <alert-component>
-
+                <alert-component :details="alert">
                 </alert-component>
             </template>
 
             <template v-slot:content>
                 <input-component classes="row mb-3" id="stashTitle" title="Title">
-                    <input id="stashTitle" type="text" name="stashTitle" class="form-control" required autofocus v-model="stashTitle">
+                    <input id="stashTitle" type="text" class="form-control" required autofocus v-model="stashTitle">
                 </input-component>
-        
+
+                <input-component classes="row mb-3" id="stashDescription" title="Description">
+                    <input id="stashDescription" type="text" class="form-control" required autofocus v-model="stashDescription">
+                </input-component>
+
                 <input-component classes="row mb-3" id="stashTopic" title="Topic">
-                    <select name="stashTopic" id="">
+                    <select id="">
                         <option value="" selected> Select a topic: </option>
-                        <option value="1"> random topic 01 </option>
-                        <option value="2"> random topic 02 </option>
                         <option :value="topic.id" v-for="topic, key in topics" :key="key">
                             {{ topic.id }} - {{ topic.title }}
                         </option>
                     </select>
-                </input-component>
-
-                <input-component classes="row mb-3" id="stashDescription" title="description">
-                    <input id="stashDescription" type="text" name="stashDescription" class="form-control" required autofocus v-model="stashDescription">
                 </input-component>
             </template>
             
@@ -68,7 +65,8 @@
         ],
         data() {
             return {
-                // stashes: [],
+                baseUrl: 'http://alltreasures.herokuapp.com',
+                stashes: [],
                 topics: [],
                 stashTitle: '',
                 stashTopic: '',
@@ -85,14 +83,14 @@
                     id: 'addStashModal',
                     title: 'Add New Stash'
                 },
-                stashes: [
-                    {table_show: false, show: false, id: '1', user_id: '1', title: 'stash 01', topic: 'demo', description: 'collection of demo', artifacts: [
-                    {id: '1', title: 'artifact 01', stash_id: '1', tags: ['demo']},
-                    {id: '2', title: 'artifact 02', stash_id: '1', tags: ['demo']},
-                    {id: '3', title: 'artifact 03', stash_id: '1', tags: ['demo']},
-                    {id: '4', title: 'artifact 04', stash_id: '1', tags: ['demo']},
-                    {id: '5', title: 'artifact 05', stash_id: '1', tags: ['demo']},
-                ]},
+                alert: {
+                    status: null,
+                    object: {},
+                    message: '',
+                    errors: [],
+                },
+                mockStashes: [
+                    {table_show: false, show: false, id: '1', user_id: '1', title: 'stash 01', topic: 'demo', description: 'collection of demo', artifacts: []},
                     {table_show: false, show: false, id: '4', user_id: '1', title: 'stash 04', topic: 'pokemon', description: 'collection of pokemon', artifacts: [
                     {id: '16', title: 'artifact 16', stash_id: '4', tags: ['pokemon']},
                     {id: '17', title: 'artifact 17', stash_id: '4', tags: ['pokemon']},
@@ -112,26 +110,28 @@
             }
         },
         methods: {
-            // loadStashes() {
-            //     let url = 'http://alltreasures.herokuapp.com' + '/stashes/all-stashes/' + this.userid;
+            loadStashes() {
+                this.stashes = this.mockStashes;
 
-            //     let config = {
-            //         headers: {
-            //             'Accept': 'application/json',
-            //         }
-            //     }
+                // let url = this.baseUrl + '/stashes/all-stashes/' + this.userid;
 
-            //     axios.get(url, config)
-            //         .then(response => {
-            //             console.log(response);
-            //             this.stashes = response.data;
-            //         })
-            //         .catch(errors => {
-            //             console.log(errors);
-            //         });
-            // },
+                // let config = {
+                //     headers: {
+                //         'Accept': 'application/json',
+                //     }
+                // }
+
+                // axios.get(url, config)
+                //     .then(response => {
+                //         console.log(response);
+                //         this.stashes = response.data;
+                //     })
+                //     .catch(errors => {
+                //         console.log(errors);
+                //     });
+            },
             loadTopics() {
-                let url = 'http://alltreasures.herokuapp.com' + '/topic/all-topics';
+                let url = this.baseUrl + '/topic/all-topics';
 
                 let config = {
                     headers: {
@@ -145,16 +145,11 @@
                         this.topics = response.data;
                     })
                     .catch(errors => {
-                        console.log(errrors);
+                        console.log (errors);
                     });
             },
-            cleanNewStashData() {
-                this.stashTitle = '',
-                this.stashTopic = '',
-                this.stashDescription = ''
-            },
             addStash() {
-                let url = 'http://alltreasures.herokuapp.com' + '/stash/create';
+                let url = this.baseUrl + '/stash/create';
 
                 let formData = new FormData();
                 formData.append('user_id', this.userid);
@@ -171,16 +166,33 @@
 
                 axios.post(url, formData, config)
                     .then(response => {
+                        this.alert.status = 'success';
+                        this.alert.object = response.data;
+                        this.loadStashes();
+                        this.cleanNewStashData();
                         console.log(response);
-                        //Alert signals
                     })
                     .catch(errors => {
+                        this.alert.status = 'danger';
+                        this.alert.message = errors.response.message;
+                        this.alert.errors = errors.response.errors;
                         console.log(errors.response);
                     })
-            }
+            },
+            cleanNewStashData() {
+                this.stashTitle = '',
+                this.stashTopic = '',
+                this.stashDescription = '',
+                this.alert  = {
+                    status: null,
+                    object: {},
+                    message: '',
+                    errors: [],
+                }
+            },
         },
         mounted() {
-            // this.loadStashes();
+            this.loadStashes();
             this.loadTopics();
         },
     }

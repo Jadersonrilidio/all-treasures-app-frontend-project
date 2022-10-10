@@ -78,11 +78,36 @@
 
         <div class="card-footer" v-if="stash.show">
             <!-- Button trigger modal // ADD_ARTIFACT_MODAL -->
-            <button class="btn btn-sm btn-primary" style="float:right" data-bs-toggle="modal" data-bs-target="#addArtifactModal">
+            <button class="btn btn-sm btn-primary" style="float:right" data-bs-toggle="modal" :data-bs-target="'#'+modalAdd.id">
                 Add New Artifact
             </button>
         </div>
-    
+
+    <!-- start modal ADD_ARTIFACT_MODAL -->
+    <modal-component :id="modalAdd.id" :title="modalAdd.title">
+        <template v-slot:alerts>
+            <alert-component :details="alert">
+            </alert-component>
+        </template>
+
+        <template v-slot:content>
+
+            <input-component classes="row mb-3" id="artifactTitle" title="Title">
+                <input id="artifactTitle" type="text" class="form-control" required autofocus v-model="artifactTitle">
+            </input-component>
+
+            <input-component classes="row mb-3" id="artifactTags" title="Tags">
+                <input id="artifactTags" type="text" class="form-control" required autofocus v-model="artifactTags">
+            </input-component>
+
+        </template>
+        
+        <template v-slot:footer>
+            <button type="submit" class="btn btn-secondary" style="float:right" data-bs-dismiss="modal" @click="cleanNewArtifactData()">Cancel</button>
+            <button type="submit" class="btn btn-primary" style="float:right" @click="addArtifact()">Add</button>
+        </template>
+    </modal-component>
+
     </div>
 </template>
 
@@ -93,6 +118,7 @@
         ],
         data() {
             return {
+                baseUrl: 'http://alltreasures.herokuapp.com',
                 artifacts: [],
                 buttons: {
                     view: {
@@ -146,14 +172,27 @@
                         title: 'Delete',
                         class: 'danger',
                     }
+                },
+                modalAdd: {
+                    id: 'addArtifactModal_' + this.stash.id,
+                    title: 'Add New Artifact to stash ' + this.stash.title
+                },
+                artifactTitle: '',
+                artifactStashId: this.stash.id,
+                artifactTags: '',
+                alert: {
+                    status: null,
+                    object: {},
+                    message: '',
+                    errors: [],
                 }
             }
         },
         methods: {
-            getStashArtifacts() {
+            loadStashArtifacts() {
                 this.artifacts = this.stash.artifacts;
 
-                // let url = 'http://alltreasures.herokuapp.com/artifact/all-artifacts/stash_id=' + this.stash.id;
+                // let url = this.baseUrl + '/artifact/all-artifacts/stash_id=' + this.stash.id;
 
                 // let config = {
                 //     headers: {
@@ -170,6 +209,44 @@
                 //         console.log(errors.response);
                 //     })
             },
+            addArtifact() {
+                let url = this.baseUrl + '/artifact/create';
+
+                let formData = new FormData();
+                formData.append('title', this.artifactTitle);
+                formData.append('stashId', this.artifactStashId);
+                formData.append('tags', this.tagsToArray);
+
+                let config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                }
+
+                axios.post(url, formData, config)
+                    .then(response => {
+                        this.alert.status = 'success';
+                        this.alert.object = response.data;
+                        this.loadStashArtifacts();
+                        this.cleanNewArtifactData();
+                        console.log(response);
+                    })
+                    .catch(errors => {
+                        console.log(errors);
+                    })
+            },
+            cleanNewArtifactData() {
+                this.artifactTitle = '',
+                this.artifactStashId = this.stash.id,
+                this.artifactTags = '',
+                this.alert = {
+                    status: null,
+                    object: {},
+                    message: '',
+                    errors: [],
+                }
+            },
             setStashAttributes() {
                 this.stash['show'] = false;
                 this.stash['table_show'] = false;
@@ -184,10 +261,13 @@
         computed: {
             numberOfArtifacts() {
                 return this.artifacts ? this.artifacts.length : 0;
+            },
+            tagsToArray() {
+                return this.artifactTags.split(', ');
             }
         },
         mounted() {
-            this.getStashArtifacts();
+            this.loadStashArtifacts();
             this.setStashAttributes();
         }
     }

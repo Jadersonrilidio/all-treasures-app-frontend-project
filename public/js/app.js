@@ -5314,7 +5314,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: []
+  props: ['details'],
+  computed: {
+    title: function title() {
+      return this.details.status == 'success' ? 'Success' : 'Error';
+    }
+  }
 });
 
 /***/ }),
@@ -5487,6 +5492,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       baseUrl: 'https://alltreasures.herokuapp.com',
+      userid: '',
       username: '',
       password: '',
       password_confirm: '',
@@ -5502,6 +5508,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     register: function register(event) {
+      var _this = this;
+
       if (this.password != this.password_confirm) return;
       var url = this.baseUrl + '/user/signup';
       var formData = new FormData();
@@ -5516,6 +5524,8 @@ __webpack_require__.r(__webpack_exports__);
       };
       axios.post(url, formData, config).then(function (response) {
         console.log(response);
+        _this.userid = response.data.userId;
+        _this.username = response.data.username;
         event.target.submit();
       })["catch"](function (errors) {
         console.log(errors.response);
@@ -5541,7 +5551,8 @@ __webpack_require__.r(__webpack_exports__);
   props: ['username', 'userid'],
   data: function data() {
     return {
-      // stashes: [],
+      baseUrl: 'http://alltreasures.herokuapp.com',
+      stashes: [],
       topics: [],
       stashTitle: '',
       stashTopic: '',
@@ -5558,7 +5569,13 @@ __webpack_require__.r(__webpack_exports__);
         id: 'addStashModal',
         title: 'Add New Stash'
       },
-      stashes: [{
+      alert: {
+        status: null,
+        object: {},
+        message: '',
+        errors: []
+      },
+      mockStashes: [{
         table_show: false,
         show: false,
         id: '1',
@@ -5566,32 +5583,7 @@ __webpack_require__.r(__webpack_exports__);
         title: 'stash 01',
         topic: 'demo',
         description: 'collection of demo',
-        artifacts: [{
-          id: '1',
-          title: 'artifact 01',
-          stash_id: '1',
-          tags: ['demo']
-        }, {
-          id: '2',
-          title: 'artifact 02',
-          stash_id: '1',
-          tags: ['demo']
-        }, {
-          id: '3',
-          title: 'artifact 03',
-          stash_id: '1',
-          tags: ['demo']
-        }, {
-          id: '4',
-          title: 'artifact 04',
-          stash_id: '1',
-          tags: ['demo']
-        }, {
-          id: '5',
-          title: 'artifact 05',
-          stash_id: '1',
-          tags: ['demo']
-        }]
+        artifacts: []
       }, {
         table_show: false,
         show: false,
@@ -5669,26 +5661,26 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    // loadStashes() {
-    //     let url = 'http://alltreasures.herokuapp.com' + '/stashes/all-stashes/' + this.userid;
-    //     let config = {
-    //         headers: {
-    //             'Accept': 'application/json',
-    //         }
-    //     }
-    //     axios.get(url, config)
-    //         .then(response => {
-    //             console.log(response);
-    //             this.stashes = response.data;
-    //         })
-    //         .catch(errors => {
-    //             console.log(errors);
-    //         });
-    // },
+    loadStashes: function loadStashes() {
+      this.stashes = this.mockStashes; // let url = this.baseUrl + '/stashes/all-stashes/' + this.userid;
+      // let config = {
+      //     headers: {
+      //         'Accept': 'application/json',
+      //     }
+      // }
+      // axios.get(url, config)
+      //     .then(response => {
+      //         console.log(response);
+      //         this.stashes = response.data;
+      //     })
+      //     .catch(errors => {
+      //         console.log(errors);
+      //     });
+    },
     loadTopics: function loadTopics() {
       var _this = this;
 
-      var url = 'http://alltreasures.herokuapp.com' + '/topic/all-topics';
+      var url = this.baseUrl + '/topic/all-topics';
       var config = {
         headers: {
           'Accept': 'application/json'
@@ -5698,14 +5690,13 @@ __webpack_require__.r(__webpack_exports__);
         console.log(response);
         _this.topics = response.data;
       })["catch"](function (errors) {
-        console.log(errrors);
+        console.log(errors);
       });
     },
-    cleanNewStashData: function cleanNewStashData() {
-      this.stashTitle = '', this.stashTopic = '', this.stashDescription = '';
-    },
     addStash: function addStash() {
-      var url = 'http://alltreasures.herokuapp.com' + '/stash/create';
+      var _this2 = this;
+
+      var url = this.baseUrl + '/stash/create';
       var formData = new FormData();
       formData.append('user_id', this.userid);
       formData.append('title', this.stashTitle);
@@ -5718,14 +5709,32 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.post(url, formData, config).then(function (response) {
-        console.log(response); //Alert signals
+        _this2.alert.status = 'success';
+        _this2.alert.object = response.data;
+
+        _this2.loadStashes();
+
+        _this2.cleanNewStashData();
+
+        console.log(response);
       })["catch"](function (errors) {
+        _this2.alert.status = 'danger';
+        _this2.alert.message = errors.response.message;
+        _this2.alert.errors = errors.response.errors;
         console.log(errors.response);
       });
+    },
+    cleanNewStashData: function cleanNewStashData() {
+      this.stashTitle = '', this.stashTopic = '', this.stashDescription = '', this.alert = {
+        status: null,
+        object: {},
+        message: '',
+        errors: []
+      };
     }
   },
   mounted: function mounted() {
-    // this.loadStashes();
+    this.loadStashes();
     this.loadTopics();
   }
 });
@@ -5747,6 +5756,7 @@ __webpack_require__.r(__webpack_exports__);
   props: ['stash'],
   data: function data() {
     return {
+      baseUrl: 'http://alltreasures.herokuapp.com',
       artifacts: [],
       buttons: {
         view: {
@@ -5800,12 +5810,25 @@ __webpack_require__.r(__webpack_exports__);
           title: 'Delete',
           "class": 'danger'
         }
+      },
+      modalAdd: {
+        id: 'addArtifactModal_' + this.stash.id,
+        title: 'Add New Artifact to stash ' + this.stash.title
+      },
+      artifactTitle: '',
+      artifactStashId: this.stash.id,
+      artifactTags: '',
+      alert: {
+        status: null,
+        object: {},
+        message: '',
+        errors: []
       }
     };
   },
   methods: {
-    getStashArtifacts: function getStashArtifacts() {
-      this.artifacts = this.stash.artifacts; // let url = 'http://alltreasures.herokuapp.com/artifact/all-artifacts/stash_id=' + this.stash.id;
+    loadStashArtifacts: function loadStashArtifacts() {
+      this.artifacts = this.stash.artifacts; // let url = this.baseUrl + '/artifact/all-artifacts/stash_id=' + this.stash.id;
       // let config = {
       //     headers: {
       //         'Accept': 'application/json'
@@ -5819,6 +5842,41 @@ __webpack_require__.r(__webpack_exports__);
       //     .catch(errors => {
       //         console.log(errors.response);
       //     })
+    },
+    addArtifact: function addArtifact() {
+      var _this = this;
+
+      var url = this.baseUrl + '/artifact/create';
+      var formData = new FormData();
+      formData.append('title', this.artifactTitle);
+      formData.append('stashId', this.artifactStashId);
+      formData.append('tags', this.tagsToArray);
+      var config = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      };
+      axios.post(url, formData, config).then(function (response) {
+        _this.alert.status = 'success';
+        _this.alert.object = response.data;
+
+        _this.loadStashArtifacts();
+
+        _this.cleanNewArtifactData();
+
+        console.log(response);
+      })["catch"](function (errors) {
+        console.log(errors);
+      });
+    },
+    cleanNewArtifactData: function cleanNewArtifactData() {
+      this.artifactTitle = '', this.artifactStashId = this.stash.id, this.artifactTags = '', this.alert = {
+        status: null,
+        object: {},
+        message: '',
+        errors: []
+      };
     },
     setStashAttributes: function setStashAttributes() {
       this.stash['show'] = false;
@@ -5834,10 +5892,13 @@ __webpack_require__.r(__webpack_exports__);
   computed: {
     numberOfArtifacts: function numberOfArtifacts() {
       return this.artifacts ? this.artifacts.length : 0;
+    },
+    tagsToArray: function tagsToArray() {
+      return this.artifactTags.split(', ');
     }
   },
   mounted: function mounted() {
-    this.getStashArtifacts();
+    this.loadStashArtifacts();
     this.setStashAttributes();
   }
 });
@@ -5931,7 +5992,17 @@ var render = function render() {
   var _vm = this,
       _c = _vm._self._c;
 
-  return _c("div");
+  return _vm.details.status ? _c("div", {
+    staticClass: "alert",
+    "class": "alert-" + _vm.details.status,
+    attrs: {
+      role: "alert"
+    }
+  }, [_c("strong", [_vm._v(_vm._s(_vm.title) + ": ")]), _vm._v(" "), _c("hr"), _vm._v(" "), _vm.details.message ? [_c("span", [_vm._v(_vm._s(_vm.details.message))]), _vm._v(" "), _c("br"), _vm._v(" "), _vm.details.errors ? _c("ul", _vm._l(_vm.details.errors, function (error, key) {
+    return _c("li", {
+      key: key
+    }, [_vm._v("\n                " + _vm._s(error[0]) + "\n            ")]);
+  }), 0) : _vm._e()] : _vm._e(), _vm._v(" "), _vm.details.object.id ? [_c("span", [_vm._v(_vm._s("Register ID: " + _vm.details.object.id))]), _vm._v(" "), _c("br"), _vm._v(" "), _vm.details.object ? _c("pre", [_vm._v(_vm._s(_vm.details.object))]) : _vm._e()] : _vm._e()], 2) : _vm._e();
 };
 
 var staticRenderFns = [];
@@ -6314,6 +6385,26 @@ var render = function render() {
           domProps: {
             value: _vm.csrf_token
           }
+        }), _vm._v(" "), _c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.userid,
+            expression: "userid"
+          }],
+          attrs: {
+            type: "hidden",
+            name: "userid"
+          },
+          domProps: {
+            value: _vm.userid
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+              _vm.userid = $event.target.value;
+            }
+          }
         }), _vm._v(" "), _c("input-component", {
           attrs: {
             classes: "row mb-3",
@@ -6507,7 +6598,11 @@ var render = function render() {
     scopedSlots: _vm._u([{
       key: "alerts",
       fn: function fn() {
-        return [_c("alert-component")];
+        return [_c("alert-component", {
+          attrs: {
+            details: _vm.alert
+          }
+        })];
       },
       proxy: true
     }, {
@@ -6530,7 +6625,6 @@ var render = function render() {
           attrs: {
             id: "stashTitle",
             type: "text",
-            name: "stashTitle",
             required: "",
             autofocus: ""
           },
@@ -6546,39 +6640,8 @@ var render = function render() {
         })]), _vm._v(" "), _c("input-component", {
           attrs: {
             classes: "row mb-3",
-            id: "stashTopic",
-            title: "Topic"
-          }
-        }, [_c("select", {
-          attrs: {
-            name: "stashTopic",
-            id: ""
-          }
-        }, [_c("option", {
-          attrs: {
-            value: "",
-            selected: ""
-          }
-        }, [_vm._v(" Select a topic: ")]), _vm._v(" "), _c("option", {
-          attrs: {
-            value: "1"
-          }
-        }, [_vm._v(" random topic 01 ")]), _vm._v(" "), _c("option", {
-          attrs: {
-            value: "2"
-          }
-        }, [_vm._v(" random topic 02 ")]), _vm._v(" "), _vm._l(_vm.topics, function (topic, key) {
-          return _c("option", {
-            key: key,
-            domProps: {
-              value: topic.id
-            }
-          }, [_vm._v("\n                        " + _vm._s(topic.id) + " - " + _vm._s(topic.title) + "\n                    ")]);
-        })], 2)]), _vm._v(" "), _c("input-component", {
-          attrs: {
-            classes: "row mb-3",
             id: "stashDescription",
-            title: "description"
+            title: "Description"
           }
         }, [_c("input", {
           directives: [{
@@ -6591,7 +6654,6 @@ var render = function render() {
           attrs: {
             id: "stashDescription",
             type: "text",
-            name: "stashDescription",
             required: "",
             autofocus: ""
           },
@@ -6604,7 +6666,29 @@ var render = function render() {
               _vm.stashDescription = $event.target.value;
             }
           }
-        })])];
+        })]), _vm._v(" "), _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "stashTopic",
+            title: "Topic"
+          }
+        }, [_c("select", {
+          attrs: {
+            id: ""
+          }
+        }, [_c("option", {
+          attrs: {
+            value: "",
+            selected: ""
+          }
+        }, [_vm._v(" Select a topic: ")]), _vm._v(" "), _vm._l(_vm.topics, function (topic, key) {
+          return _c("option", {
+            key: key,
+            domProps: {
+              value: topic.id
+            }
+          }, [_vm._v("\n                        " + _vm._s(topic.id) + " - " + _vm._s(topic.title) + "\n                    ")]);
+        })], 2)])];
       },
       proxy: true
     }, {
@@ -6767,9 +6851,122 @@ var render = function render() {
     },
     attrs: {
       "data-bs-toggle": "modal",
-      "data-bs-target": "#addArtifactModal"
+      "data-bs-target": "#" + _vm.modalAdd.id
     }
-  }, [_vm._v("\n            Add New Artifact\n        ")])]) : _vm._e()]);
+  }, [_vm._v("\n            Add New Artifact\n        ")])]) : _vm._e(), _vm._v(" "), _c("modal-component", {
+    attrs: {
+      id: _vm.modalAdd.id,
+      title: _vm.modalAdd.title
+    },
+    scopedSlots: _vm._u([{
+      key: "alerts",
+      fn: function fn() {
+        return [_c("alert-component", {
+          attrs: {
+            details: _vm.alert
+          }
+        })];
+      },
+      proxy: true
+    }, {
+      key: "content",
+      fn: function fn() {
+        return [_c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "artifactTitle",
+            title: "Title"
+          }
+        }, [_c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.artifactTitle,
+            expression: "artifactTitle"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            id: "artifactTitle",
+            type: "text",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.artifactTitle
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+              _vm.artifactTitle = $event.target.value;
+            }
+          }
+        })]), _vm._v(" "), _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "artifactTags",
+            title: "Tags"
+          }
+        }, [_c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.artifactTags,
+            expression: "artifactTags"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            id: "artifactTags",
+            type: "text",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.artifactTags
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+              _vm.artifactTags = $event.target.value;
+            }
+          }
+        })])];
+      },
+      proxy: true
+    }, {
+      key: "footer",
+      fn: function fn() {
+        return [_c("button", {
+          staticClass: "btn btn-secondary",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            type: "submit",
+            "data-bs-dismiss": "modal"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.cleanNewArtifactData();
+            }
+          }
+        }, [_vm._v("Cancel")]), _vm._v(" "), _c("button", {
+          staticClass: "btn btn-primary",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            type: "submit"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.addArtifact();
+            }
+          }
+        }, [_vm._v("Add")])];
+      },
+      proxy: true
+    }])
+  })], 1);
 };
 
 var staticRenderFns = [function () {
