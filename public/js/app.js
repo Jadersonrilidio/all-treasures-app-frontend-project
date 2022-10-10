@@ -5933,20 +5933,53 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ['username', 'userid'],
   data: function data() {
     return {
+      baseUrl: 'http://alltreasures.herokuapp.com',
       topics: [],
+      topicTitle: '',
       card: {
         title: 'Topics list',
         components: {
           header: true,
           body: true,
           footer: true
+        }
+      },
+      alert: {
+        status: null,
+        object: {},
+        message: '',
+        errors: []
+      },
+      modalAdd: {
+        id: 'addTopicModal',
+        title: 'Add New Topic'
+      },
+      modalEdit: {
+        id: 'editTopicModal',
+        title: 'Edit Topic'
+      },
+      modalDelete: {
+        id: 'deleteTopicModal',
+        title: 'Delete Topic'
+      },
+      table_columns: {
+        id: 'ID',
+        title: 'Topic'
+      },
+      table_buttons: {
+        edit: {
+          title: 'Edit',
+          "class": 'success',
+          target: '#editTopicModal'
+        },
+        "delete": {
+          title: 'Delete',
+          "class": 'danger',
+          target: '#deleteTopicModal'
         }
       }
     };
@@ -5955,18 +5988,81 @@ __webpack_require__.r(__webpack_exports__);
     loadTopics: function loadTopics() {
       var _this = this;
 
-      var url = 'http://alltreasures.herokuapp.com/topic/all-topics';
+      var url = this.baseUrl + '/topic/all-topics';
       var config = {
         headers: {
           'Accept': 'application/json'
         }
       };
-      axios__WEBPACK_IMPORTED_MODULE_0___default().get(url, config).then(function (response) {
+      axios.get(url, config).then(function (response) {
         console.log(response);
-        _this.topics = response.data;
+        _this.topics = response.data.content;
       })["catch"](function (errors) {
-        console.log(errrors);
+        console.log(errors);
       });
+    },
+    addTopic: function addTopic() {
+      var _this2 = this;
+
+      var url = this.baseUrl;
+      var formData = new FormData();
+      formData.append('title', this.topicTitle);
+      var config = {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      };
+      axios.post(url, formData, config).then(function (response) {
+        console.log(response);
+        _this2.alert.status = 'success';
+        _this2.alert.object = response.data;
+
+        _this2.loadTopics();
+
+        _this2.cleanNewTopicData();
+      })["catch"](function (errors) {
+        console.log(errors.response);
+        _this2.alert.status = 'danger';
+        _this2.alert.message = errors.response.message;
+        _this2.alert.errors = errors.response.errors;
+      });
+    },
+    updateTopic: function updateTopic() {
+      var _this3 = this;
+
+      var url = this.baseUrl + $store.state.item.id;
+      var formData = new FormData();
+      formData.append('title', $store.state.item.title);
+      var config = {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      };
+      axios.post(url, formData, config).then(function (response) {
+        console.log(response);
+        _this3.alert.status = 'success';
+        _this3.alert.object = response.data;
+
+        _this3.loadTopics();
+
+        _this3.cleanNewTopicData();
+      })["catch"](function (errors) {
+        console.log(errors.response);
+        _this3.alert.status = 'danger';
+        _this3.alert.message = errors.response.message;
+        _this3.alert.errors = errors.response.errors;
+      });
+    },
+    cleanNewTopicData: function cleanNewTopicData() {
+      this.topicTitle = '';
+      this.alert = {
+        status: null,
+        object: {},
+        message: '',
+        errors: []
+      };
     }
   },
   mounted: function mounted() {
@@ -7051,7 +7147,8 @@ var render = function render() {
         staticClass: "btn btn-sm",
         "class": "btn-outline-" + button["class"],
         attrs: {
-          href: "#"
+          "data-bs-toggle": "modal",
+          "data-bs-target": button.target
         }
       }, [_vm._v("\n                    " + _vm._s(button.title) + "\n                ")])]);
     })], 2);
@@ -7094,7 +7191,13 @@ var render = function render() {
     scopedSlots: _vm._u([{
       key: "body",
       fn: function fn() {
-        return [_c("table-component")];
+        return [_c("table-component", {
+          attrs: {
+            columns: _vm.table_columns,
+            buttons: _vm.table_buttons,
+            items: _vm.topics
+          }
+        })];
       },
       proxy: true
     }, {
@@ -7106,13 +7209,209 @@ var render = function render() {
             "float": "right"
           },
           attrs: {
-            type: "submit"
+            "data-bs-toggle": "modal",
+            "data-bs-target": "#" + _vm.modalAdd.id
           }
         }, [_vm._v("Add Topic")])];
       },
       proxy: true
     }])
-  })], 1)])]);
+  })], 1)]), _vm._v(" "), _c("modal-component", {
+    attrs: {
+      id: _vm.modalAdd.id,
+      title: _vm.modalAdd.title
+    },
+    scopedSlots: _vm._u([{
+      key: "alerts",
+      fn: function fn() {
+        return [_c("alert-component", {
+          attrs: {
+            details: _vm.alert
+          }
+        })];
+      },
+      proxy: true
+    }, {
+      key: "content",
+      fn: function fn() {
+        return [_c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "topicTitle",
+            title: "Title"
+          }
+        }, [_c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.topicTitle,
+            expression: "topicTitle"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            id: "topicTitle",
+            type: "text",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.topicTitle
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+              _vm.topicTitle = $event.target.value;
+            }
+          }
+        })])];
+      },
+      proxy: true
+    }, {
+      key: "footer",
+      fn: function fn() {
+        return [_c("button", {
+          staticClass: "btn btn-secondary",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            "data-bs-dismiss": "modal"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.cleanNewTopicData();
+            }
+          }
+        }, [_vm._v("Cancel")]), _vm._v(" "), _c("button", {
+          staticClass: "btn btn-primary",
+          staticStyle: {
+            "float": "right"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.addTopic();
+            }
+          }
+        }, [_vm._v("Add")])];
+      },
+      proxy: true
+    }])
+  }), _vm._v(" "), _c("modal-component", {
+    attrs: {
+      id: _vm.modalEdit.id,
+      title: _vm.modalEdit.title
+    },
+    scopedSlots: _vm._u([{
+      key: "alerts",
+      fn: function fn() {
+        return [_c("alert-component", {
+          attrs: {
+            details: _vm.alert
+          }
+        })];
+      },
+      proxy: true
+    }, {
+      key: "content",
+      fn: function fn() {
+        return [_c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "topicTitle",
+            title: "Title"
+          }
+        }, [_c("input", {
+          staticClass: "form-control",
+          attrs: {
+            id: "topicTitle",
+            type: "text",
+            required: "",
+            autofocus: ""
+          }
+        })])];
+      },
+      proxy: true
+    }, {
+      key: "footer",
+      fn: function fn() {
+        return [_c("button", {
+          staticClass: "btn btn-secondary",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            "data-bs-dismiss": "modal"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.cleanNewTopicData();
+            }
+          }
+        }, [_vm._v("Cancel")]), _vm._v(" "), _c("button", {
+          staticClass: "btn btn-success",
+          staticStyle: {
+            "float": "right"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.updateTopic();
+            }
+          }
+        }, [_vm._v("Update")])];
+      },
+      proxy: true
+    }])
+  }), _vm._v(" "), _c("modal-component", {
+    attrs: {
+      id: _vm.modalDelete.id,
+      title: _vm.modalDelete.title
+    },
+    scopedSlots: _vm._u([{
+      key: "content",
+      fn: function fn() {
+        return [_c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "topicTitle",
+            title: "Title"
+          }
+        }, [_c("input", {
+          staticClass: "form-control",
+          attrs: {
+            id: "topicTitle",
+            type: "text",
+            disabled: "",
+            value: "$store.state.item.title"
+          }
+        })])];
+      },
+      proxy: true
+    }, {
+      key: "footer",
+      fn: function fn() {
+        return [_c("button", {
+          staticClass: "btn btn-secondary",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            "data-bs-dismiss": "modal"
+          }
+        }, [_vm._v("Close")]), _vm._v(" "), _c("button", {
+          staticClass: "btn btn-danger",
+          staticStyle: {
+            "float": "right"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.deleteTopic();
+            }
+          }
+        }, [_vm._v("Delete")])];
+      },
+      proxy: true
+    }])
+  })], 1);
 };
 
 var staticRenderFns = [];
@@ -42806,18 +43105,6 @@ module.exports = JSON.parse('{"_args":[["axios@0.21.4","/home/jay/Documents/proj
 /******/ 				}
 /******/ 			}
 /******/ 			return result;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
 /******/ 		};
 /******/ 	})();
 /******/ 	

@@ -23,6 +23,7 @@
             </div>
         </div>
 
+        <!-- start modal ADD_STASH_MODAL -->
         <modal-component :id="modalAdd.id" :title="modalAdd.title">
             <template v-slot:alerts>
                 <alert-component :details="alert">
@@ -53,6 +54,7 @@
                 <button type="submit" class="btn btn-primary" style="float:right" @click="addStash()">Add</button>
             </template>
         </modal-component>
+        <!-- end modal ADD_STASH_MODAL -->
 
     </div>
 </template>

@@ -19,7 +19,7 @@
                 </td>
                 
                 <td v-for="button, k in buttons" :key="k">
-                    <a class="btn btn-sm" :class="'btn-outline-'+button.class" href="#">
+                    <a class="btn btn-sm" :class="'btn-outline-'+button.class" data-bs-toggle="modal" :data-bs-target="button.target">
                         {{ button.title }}
                     </a>
                 </td>
