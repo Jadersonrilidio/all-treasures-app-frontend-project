@@ -5595,12 +5595,12 @@ __webpack_require__.r(__webpack_exports__);
         }
       },
       stash_card_buttons: {
-        // view: {
-        //     type: 'link',
-        //     title: 'View',
-        //     class: 'primary',
-        //     target: ''
-        // },
+        view: {
+          type: 'link',
+          title: 'View',
+          "class": 'primary',
+          target: ''
+        },
         edit: {
           type: 'modal',
           title: 'Edit',
@@ -5639,109 +5639,7 @@ __webpack_require__.r(__webpack_exports__);
         object: {},
         message: '',
         errors: []
-      },
-      mockStashes: [{
-        table_show: false,
-        show: false,
-        id: '1',
-        user_id: '1',
-        title: 'stash 01',
-        topic: 'demo',
-        description: 'collection of demo',
-        artifacts: []
-      }, {
-        table_show: false,
-        show: false,
-        id: '4',
-        user_id: '1',
-        title: 'stash 04',
-        topic: 'pokemon',
-        description: 'collection of pokemon',
-        artifacts: [{
-          id: '16',
-          title: 'artifact 16',
-          stash_id: '4',
-          tags: ['pokemon']
-        }, {
-          id: '17',
-          title: 'artifact 17',
-          stash_id: '4',
-          tags: ['pokemon']
-        }, {
-          id: '18',
-          title: 'artifact 18',
-          stash_id: '4',
-          tags: ['pokemon']
-        }]
-      }, {
-        table_show: false,
-        show: false,
-        id: '5',
-        user_id: '1',
-        title: 'stash 05',
-        topic: 'cards',
-        description: 'collection of cards',
-        artifacts: [{
-          id: '20',
-          title: 'artifact 20',
-          stash_id: '5',
-          tags: ['cards']
-        }, {
-          id: '21',
-          title: 'artifact 21',
-          stash_id: '5',
-          tags: ['cards']
-        }, {
-          id: '22',
-          title: 'artifact 22',
-          stash_id: '5',
-          tags: ['cards']
-        }, {
-          id: '23',
-          title: 'artifact 23',
-          stash_id: '5',
-          tags: ['cards']
-        }, {
-          id: '24',
-          title: 'artifact 24',
-          stash_id: '5',
-          tags: ['cards']
-        }, {
-          id: '25',
-          title: 'artifact 25',
-          stash_id: '5',
-          tags: ['cards']
-        }, {
-          id: '26',
-          title: 'artifact 26',
-          stash_id: '5',
-          tags: ['cards']
-        }, {
-          id: '27',
-          title: 'artifact 27',
-          stash_id: '5',
-          tags: ['cards']
-        }]
-      }],
-      mockTopics: [{
-        id: '1',
-        title: 'topic model 01'
-      }, {
-        id: '2',
-        title: 'topic model 02'
-      }, {
-        id: '3',
-        title: 'topic model 03'
-      }, {
-        id: '4',
-        title: 'topic model 04'
-      }, {
-        id: '5',
-        title: 'topic model 05'
-      }, {
-        id: '6',
-        title: 'topic model 06'
-      }]
+      }
     };
   },
   methods: {
@@ -5758,7 +5656,6 @@ __webpack_require__.r(__webpack_exports__);
         _this.stashes = response.data.content;
         console.log('%c Load stashes Success: \n Route: ', 'background: #41AF41', url, response);
       })["catch"](function (errors) {
-        _this.stashes = _this.mockStashes;
         console.log('%c Load stashes Error: loading mock stashes instead \n Route: ', 'background: #FEC302', url, errors.response);
       });
     },
@@ -5775,7 +5672,6 @@ __webpack_require__.r(__webpack_exports__);
         _this2.topics = response.data.content;
         console.log('%c Load topics Success: check it out! \n Route: ', 'background: #41AF41', url, response);
       })["catch"](function (errors) {
-        _this2.topics = _this2.mockTopics;
         console.log('%c Load Topics Error: loading mock topics instead \n Route: ', 'background: #FEC302', url, errors.response);
       });
     },
