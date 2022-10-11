@@ -155,10 +155,10 @@
                 axios.get(url, config)
                     .then(response => {
                         this.topics = response.data.content;
-                        console.log('%c Add topic Success: check it out!', 'background: #41AF41', `Route: ${url}`, response);
+                        console.log('%c Load topics Success: check it out!', 'background: #41AF41', `Route: ${url}`, response);
                     })
                     .catch(errors => {
-                        console.log('%c Add topic Error: nothing happened', 'background: #FEC302', `Route: ${url}`, errors.response);
+                        console.log('%c Load topics Error: nothing happened', 'background: #FEC302', `Route: ${url}`, errors.response);
                     });
             },
             addTopic() {
@@ -197,6 +197,7 @@
 
                 let config = {
                     headers: {
+                        '_method': 'PUT',
                         'Accept': 'application/json',
                         'Content-Type': 'multipart/form-data'
                     }

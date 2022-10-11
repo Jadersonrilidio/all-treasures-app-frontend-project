@@ -5614,6 +5614,26 @@ __webpack_require__.r(__webpack_exports__);
           target: '#deleteStashModal'
         }
       },
+      table_columns: {
+        id: 'ID',
+        title: 'Artifact',
+        stash_id: 'Stash ID',
+        tags: 'Tags'
+      },
+      table_buttons: {
+        edit: {
+          type: 'modal',
+          title: 'Edit',
+          "class": 'success',
+          target: '#editArtifactModal'
+        },
+        "delete": {
+          type: 'modal',
+          title: 'Delete',
+          "class": 'danger',
+          target: '#deleteArtifactModal'
+        }
+      },
       alert: {
         status: null,
         object: {},
@@ -5799,8 +5819,9 @@ __webpack_require__.r(__webpack_exports__);
       formData.append('description', this.$store.state.item.description);
       var config = {
         headers: {
-          'Content-Type': 'multipart/form-date',
-          'Accept': 'application/json'
+          '_method': 'PUT',
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-date'
         }
       };
       axios.post(url, formData, config).then(function (response) {
@@ -5839,6 +5860,56 @@ __webpack_require__.r(__webpack_exports__);
         console.log('%c Delete stash Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
       });
     },
+    updateArtifact: function updateArtifact() {
+      var _this6 = this;
+
+      var url = this.baseUrl + '/artifact/' + $store.state.item.id;
+      var formData = new FormData();
+      formData.append('title', this.$store.state.item.title);
+      formData.append('stashId', this.$store.state.item.stashId);
+      formData.append('tags', this.storeTagsToArray());
+      var config = {
+        headers: {
+          '_method': 'PUT',
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+      axios.post(url, formData, config).then(function (response) {
+        _this6.loadStashes();
+
+        _this6.alert.status = 'success';
+        _this6.alert.object = response.data;
+        console.log('%c Update artifact Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+      })["catch"](function (errors) {
+        _this6.alert.status = 'danger';
+        _this6.alert.message = errors.response.message;
+        _this6.alert.errors = errors.response.errors;
+        console.log('%c Update artifact Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+      });
+    },
+    deleteArtifact: function deleteArtifact() {
+      var _this7 = this;
+
+      var url = this.baseUrl + '/artifact/' + this.$store.state.item.id;
+      var config = {
+        headers: {
+          'Accept': 'application/json'
+        }
+      };
+      axios["delete"](url, config).then(function (response) {
+        _this7.alert.status = 'success';
+
+        _this7.loadStashes();
+
+        console.log('%c Delete artifact Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+      })["catch"](function (errors) {
+        _this7.alert.status = 'danger';
+        _this7.alert.message = errors.response.message;
+        _this7.alert.errors = errors.response.errors;
+        console.log('%c Delete artifact Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+      });
+    },
     cleanNewStashData: function cleanNewStashData() {
       this.stashTitle = '', this.stashTopic = '', this.stashDescription = '', this.cleanAlerts();
     },
@@ -5849,6 +5920,9 @@ __webpack_require__.r(__webpack_exports__);
         message: '',
         errors: []
       };
+    },
+    storeTagsToArray: function storeTagsToArray() {
+      return this.$store.state.item.tags.split(', ').split(',');
     }
   },
   mounted: function mounted() {
@@ -5871,27 +5945,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['columns', 'buttons', 'stash'],
+  props: ['columns', 'buttons', 'tableColumns', 'tableButtons', 'stash'],
   data: function data() {
     return {
       baseUrl: 'http://alltreasures.herokuapp.com',
       artifacts: [],
-      table_columns: {
-        id: 'ID',
-        title: 'Artifact',
-        stash_id: 'Stash ID',
-        tags: 'Tags'
-      },
-      table_buttons: {
-        edit: {
-          title: 'Edit',
-          "class": 'success'
-        },
-        "delete": {
-          title: 'Delete',
-          "class": 'danger'
-        }
-      },
       modalAdd: {
         id: 'addArtifactModal_' + this.stash.id,
         title: 'Add New Artifact to stash ' + this.stash.title
@@ -5983,7 +6041,7 @@ __webpack_require__.r(__webpack_exports__);
       return this.artifacts ? this.artifacts.length : 0;
     },
     tagsToArray: function tagsToArray() {
-      return this.artifactTags.split(', ');
+      return this.artifactTags.split(', ').split(',');
     }
   },
   mounted: function mounted() {
@@ -6090,9 +6148,9 @@ __webpack_require__.r(__webpack_exports__);
       };
       axios.get(url, config).then(function (response) {
         _this.topics = response.data.content;
-        console.log('%c Add topic Success: check it out!', 'background: #41AF41', "Route: ".concat(url), response);
+        console.log('%c Load topics Success: check it out!', 'background: #41AF41', "Route: ".concat(url), response);
       })["catch"](function (errors) {
-        console.log('%c Add topic Error: nothing happened', 'background: #FEC302', "Route: ".concat(url), errors.response);
+        console.log('%c Load topics Error: nothing happened', 'background: #FEC302', "Route: ".concat(url), errors.response);
       });
     },
     addTopic: function addTopic() {
@@ -6131,6 +6189,7 @@ __webpack_require__.r(__webpack_exports__);
       formData.append('title', this.$store.state.item.title);
       var config = {
         headers: {
+          '_method': 'PUT',
           'Accept': 'application/json',
           'Content-Type': 'multipart/form-data'
         }
@@ -6778,7 +6837,9 @@ var render = function render() {
             attrs: {
               stash: stash,
               columns: _vm.stash_card_columns,
-              buttons: _vm.stash_card_buttons
+              buttons: _vm.stash_card_buttons,
+              "table-columns": _vm.table_columns,
+              "table-buttons": _vm.table_buttons
             }
           });
         });
@@ -7172,6 +7233,200 @@ var render = function render() {
       },
       proxy: true
     }])
+  }), _vm._v(" "), _c("modal-component", {
+    attrs: {
+      id: "editArtifactModal",
+      title: "Edit Artifact"
+    },
+    scopedSlots: _vm._u([{
+      key: "alerts",
+      fn: function fn() {
+        return [_c("alert-component", {
+          attrs: {
+            details: _vm.alert
+          }
+        })];
+      },
+      proxy: true
+    }, {
+      key: "content",
+      fn: function fn() {
+        return [_c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            title: "Title"
+          }
+        }, [_vm.$store.state.item.title ? _c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.$store.state.item.title,
+            expression: "$store.state.item.title"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.$store.state.item.title
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+
+              _vm.$set(_vm.$store.state.item, "title", $event.target.value);
+            }
+          }
+        }) : _vm._e()]), _vm._v(" "), _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            title: "Tags"
+          }
+        }, [_vm.$store.state.item.tags ? _c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.$store.state.item.tags,
+            expression: "$store.state.item.tags"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.$store.state.item.tags
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+
+              _vm.$set(_vm.$store.state.item, "tags", $event.target.value);
+            }
+          }
+        }) : _vm._e()])];
+      },
+      proxy: true
+    }, {
+      key: "footer",
+      fn: function fn() {
+        return [_c("button", {
+          staticClass: "btn btn-secondary",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            type: "submit",
+            "data-bs-dismiss": "modal"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.cleanAlerts();
+            }
+          }
+        }, [_vm._v("Cancel")]), _vm._v(" "), _c("button", {
+          staticClass: "btn btn-success",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            type: "submit"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.updateArtifact();
+            }
+          }
+        }, [_vm._v("Update")])];
+      },
+      proxy: true
+    }])
+  }), _vm._v(" "), _c("modal-component", {
+    attrs: {
+      id: "deleteArtifactModal",
+      title: "Delete Artifact"
+    },
+    scopedSlots: _vm._u([{
+      key: "alerts",
+      fn: function fn() {
+        return [_c("alert-component", {
+          attrs: {
+            details: _vm.alert
+          }
+        })];
+      },
+      proxy: true
+    }, {
+      key: "content",
+      fn: function fn() {
+        return [!_vm.alert.status ? _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            title: "Title"
+          }
+        }, [_vm.$store.state.item.title ? _c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            disabled: ""
+          },
+          domProps: {
+            value: _vm.$store.state.item.title
+          }
+        }) : _vm._e()]) : _vm._e(), _vm._v(" "), !_vm.alert.status ? _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            title: "Tags"
+          }
+        }, [_vm.$store.state.item.tags ? _c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            disabled: ""
+          },
+          domProps: {
+            value: _vm.$store.state.item.tags
+          }
+        }) : _vm._e()]) : _vm._e()];
+      },
+      proxy: true
+    }, {
+      key: "footer",
+      fn: function fn() {
+        return [_c("span", [_vm._v("Are you sure to delete artifact?    ")]), _vm._v(" "), _c("button", {
+          staticClass: "btn btn-secondary",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            type: "submit",
+            "data-bs-dismiss": "modal"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.cleanAlerts();
+            }
+          }
+        }, [_vm._v("Close")]), _vm._v(" "), !_vm.alert.status ? _c("button", {
+          staticClass: "btn btn-danger",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            type: "submit"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.deleteArtifact();
+            }
+          }
+        }, [_vm._v("Delete")]) : _vm._e()];
+      },
+      proxy: true
+    }])
   })], 1);
 };
 
@@ -7271,8 +7526,8 @@ var render = function render() {
     }
   }, [_vm._v("\n                        ↑\n                        "), _c("br"), _vm._v("\n                        Hide\n                    ")])]), _vm._v(" "), _c("table-component", {
     attrs: {
-      columns: _vm.table_columns,
-      buttons: _vm.table_buttons,
+      columns: _vm.tableColumns,
+      buttons: _vm.tableButtons,
       items: _vm.artifacts
     }
   })], 1) : _c("div", [_c("div", {

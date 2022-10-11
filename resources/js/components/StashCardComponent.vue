@@ -48,8 +48,8 @@
                     </div>
 
                     <table-component
-                        :columns="table_columns"
-                        :buttons="table_buttons"
+                        :columns="tableColumns"
+                        :buttons="tableButtons"
                         :items="artifacts"
                     >
                     </table-component>
@@ -107,6 +107,7 @@
             <button type="submit" class="btn btn-primary" style="float:right" @click="addArtifact()">Add</button>
         </template>
     </modal-component>
+    <!-- start modal ADD_ARTIFACT_MODAL -->
 
     </div>
 </template>
@@ -116,28 +117,14 @@
         props: [
             'columns',
             'buttons',
+            'tableColumns',
+            'tableButtons',
             'stash'
         ],
         data() {
             return {
                 baseUrl: 'http://alltreasures.herokuapp.com',
                 artifacts: [],
-                table_columns: {
-                    id: 'ID',
-                    title: 'Artifact',
-                    stash_id: 'Stash ID',
-                    tags: 'Tags',
-                },
-                table_buttons: {
-                    edit: {
-                        title: 'Edit',
-                        class: 'success',
-                    },
-                    delete: {
-                        title: 'Delete',
-                        class: 'danger',
-                    }
-                },
                 modalAdd: {
                     id: 'addArtifactModal_' + this.stash.id,
                     title: 'Add New Artifact to stash ' + this.stash.title
@@ -234,7 +221,7 @@
                 return this.artifacts ? this.artifacts.length : 0;
             },
             tagsToArray() {
-                return this.artifactTags.split(', ');
+                return this.artifactTags.split(', ').split(',');
             }
         },
         mounted() {

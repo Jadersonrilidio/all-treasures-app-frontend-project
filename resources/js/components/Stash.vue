@@ -13,6 +13,8 @@
                             :stash="stash"
                             :columns="stash_card_columns"
                             :buttons="stash_card_buttons"
+                            :table-columns="table_columns"
+                            :table-buttons="table_buttons"
                         >
                         </stash-card-component>
                     </template>
@@ -119,6 +121,55 @@
         </modal-component>
         <!-- end modal DELETE_STASH_MODAL -->
 
+        <!-- start modal EDIT_ARTIFACT_MODAL -->
+        <modal-component id="editArtifactModal" title="Edit Artifact">
+            <template v-slot:alerts>
+                <alert-component :details="alert">
+                </alert-component>
+            </template>
+    
+            <template v-slot:content>
+                <input-component classes="row mb-3" title="Title">
+                    <input type="text" class="form-control" required autofocus v-model="$store.state.item.title" v-if="$store.state.item.title">
+                </input-component>
+    
+                <input-component classes="row mb-3" title="Tags">
+                    <input type="text" class="form-control" required autofocus v-model="$store.state.item.tags" v-if="$store.state.item.tags">
+                </input-component>
+            </template>
+            
+            <template v-slot:footer>
+                <button type="submit" class="btn btn-secondary" style="float:right" data-bs-dismiss="modal" @click="cleanAlerts()">Cancel</button>
+                <button type="submit" class="btn btn-success" style="float:right" @click="updateArtifact()">Update</button>
+            </template>
+        </modal-component>
+        <!-- end modal EDIT_ARTIFACT_MODAL -->
+
+        <!-- start modal DELETE_ARTIFACT_MODAL -->
+        <modal-component id="deleteArtifactModal" title="Delete Artifact">
+            <template v-slot:alerts>
+                <alert-component :details="alert">
+                </alert-component>
+            </template>
+    
+            <template v-slot:content>
+                <input-component classes="row mb-3" title="Title" v-if="!alert.status">
+                    <input type="text" class="form-control" disabled :value="$store.state.item.title" v-if="$store.state.item.title">
+                </input-component>
+    
+                <input-component classes="row mb-3" title="Tags" v-if="!alert.status">
+                    <input type="text" class="form-control" disabled :value="$store.state.item.tags" v-if="$store.state.item.tags">
+                </input-component>
+            </template>
+            
+            <template v-slot:footer>
+                <span>Are you sure to delete artifact? &emsp;&emsp;&emsp;</span>
+                <button type="submit" class="btn btn-secondary" style="float:right" data-bs-dismiss="modal" @click="cleanAlerts()">Close</button>
+                <button type="submit" class="btn btn-danger" style="float:right" @click="deleteArtifact()" v-if="!alert.status">Delete</button>
+            </template>
+        </modal-component>
+        <!-- end modal DELETE_ARTIFACT_MODAL -->
+
     </div>
 </template>
 
@@ -191,6 +242,26 @@
                         title: 'Delete',
                         class: 'danger',
                         target: '#deleteStashModal'
+                    }
+                },
+                table_columns: {
+                    id: 'ID',
+                    title: 'Artifact',
+                    stash_id: 'Stash ID',
+                    tags: 'Tags',
+                },
+                table_buttons: {
+                    edit: {
+                        type: 'modal',
+                        title: 'Edit',
+                        class: 'success',
+                        target: '#editArtifactModal'
+                    },
+                    delete: {
+                        type: 'modal',
+                        title: 'Delete',
+                        class: 'danger',
+                        target: '#deleteArtifactModal'
                     }
                 },
                 alert: {
@@ -307,8 +378,9 @@
 
                 let config = {
                     headers: {
-                        'Content-Type': 'multipart/form-date',
-                        'Accept': 'application/json'
+                        '_method': 'PUT',
+                        'Accept': 'application/json',
+                        'Content-Type': 'multipart/form-date'
                     }
                 };
 
@@ -348,6 +420,58 @@
                         console.log('%c Delete stash Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
                     })
             },
+            updateArtifact() {
+                let url = this.baseUrl + '/artifact/' + $store.state.item.id;
+                
+                let formData = new FormData();
+                formData.append('title', this.$store.state.item.title);
+                formData.append('stashId', this.$store.state.item.stashId);
+                formData.append('tags', this.storeTagsToArray());
+
+                let config = {
+                    headers: {
+                        '_method': 'PUT',
+                        'Accept': 'application/json',
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+
+                axios.post(url, formData, config)
+                    .then(response => {
+                        this.loadStashes();
+                        this.alert.status = 'success';
+                        this.alert.object = response.data;
+                        console.log('%c Update artifact Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+                    })
+                    .catch(errors => {
+                        this.alert.status = 'danger';
+                        this.alert.message = errors.response.message;
+                        this.alert.errors = errors.response.errors;
+                        console.log('%c Update artifact Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+                    })
+            },
+            deleteArtifact() {
+                let url = this.baseUrl + '/artifact/' + this.$store.state.item.id;
+
+                let config = {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                };
+
+                axios.delete(url, config)
+                    .then(response => {
+                        this.alert.status = 'success';
+                        this.loadStashes();
+                        console.log('%c Delete artifact Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+                    })
+                    .catch(errors => {
+                        this.alert.status = 'danger';
+                        this.alert.message = errors.response.message;
+                        this.alert.errors = errors.response.errors;
+                        console.log('%c Delete artifact Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+                    })
+            },
             cleanNewStashData() {
                 this.stashTitle = '',
                 this.stashTopic = '',
@@ -361,6 +485,9 @@
                     message: '',
                     errors: [],
                 }
+            },
+            storeTagsToArray() {
+                return this.$store.state.item.tags.split(', ').split(',');
             }
         },
         mounted() {
