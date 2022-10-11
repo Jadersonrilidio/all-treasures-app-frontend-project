@@ -11,6 +11,8 @@
                     <template v-slot:body>
                         <stash-card-component v-for="stash, i in stashes" :key="i"
                             :stash="stash"
+                            :columns="stash_card_columns"
+                            :buttons="stash_card_buttons"
                         >
                         </stash-card-component>
                     </template>
@@ -40,10 +42,10 @@
                 </input-component>
 
                 <input-component classes="row mb-3" id="stashTopic" title="Topic">
-                    <select id="">
-                        <option value="" selected> Select a topic: </option>
+                    <select id="" v-model="stashTopic">
+                        <option value="" selected> -- Select a topic: -- </option>
                         <option :value="topic.id" v-for="topic, key in topics" :key="key">
-                            {{ topic.id }} - {{ topic.title }}
+                            {{ topic.title }}
                         </option>
                     </select>
                 </input-component>
@@ -55,6 +57,67 @@
             </template>
         </modal-component>
         <!-- end modal ADD_STASH_MODAL -->
+
+        <!-- start modal EDIT_STASH_MODAL -->
+        <modal-component :id="modalEdit.id" :title="modalEdit.title">
+            <template v-slot:alerts>
+                <alert-component :details="alert">
+                </alert-component>
+            </template>
+
+            <template v-slot:content>
+                <input-component classes="row mb-3" id="stashTitle" title="Title">
+                    <input id="stashTitle" type="text" class="form-control" required autofocus v-model="$store.state.item.title" v-if="$store.state.item.title">
+                </input-component>
+
+                <input-component classes="row mb-3" id="stashDescription" title="Description">
+                    <input id="stashDescription" type="text" class="form-control" required autofocus v-model="$store.state.item.description" v-if="$store.state.item.description">
+                </input-component>
+
+                <input-component classes="row mb-3" id="stashTopic" title="Topic">
+                    <select id="" v-model="$store.state.item.topic" v-if="$store.state.item.topic">
+                        <option value=""> -- Select a topic: -- </option>
+                        <option :value="topic.id" v-for="topic, key in topics" :key="key">
+                            {{ topic.title }}
+                        </option>
+                    </select>
+                </input-component>
+            </template>
+            
+            <template v-slot:footer>
+                <button class="btn btn-secondary" style="float:right" data-bs-dismiss="modal" @click="cleanAlerts()">Cancel</button>
+                <button class="btn btn-success" style="float:right" @click="updateStash()">Update</button>
+            </template>
+        </modal-component>
+        <!-- end modal EDIT_STASH_MODAL -->
+
+        <!-- start modal DELETE_STASH_MODAL -->
+        <modal-component :id="modalDelete.id" :title="modalDelete.title">
+            <template v-slot:alerts>
+                <alert-component :details="alert">
+                </alert-component>
+            </template>
+
+            <template v-slot:content>
+                <input-component classes="row mb-3" title="Title" v-if="!alert.status">
+                    <input type="text" class="form-control" disabled :value="$store.state.item.title" v-if="$store.state.item.title">
+                </input-component>
+
+                <div style="text-align:center">
+                    <span>
+                        <b>ATTENTION!!!</b>
+                        All contained artifacts will be deleted as well.
+                    </span>
+                </div>
+            </template>
+            
+            <template v-slot:footer>
+                <span>Are you sure to delete stash? &emsp;&emsp;&emsp;</span>
+                <button class="btn btn-secondary" style="float:right" data-bs-dismiss="modal" @click="cleanAlerts()">Close</button>
+                <button class="btn btn-danger" style="float:right" @click="deleteStash()" v-if="!alert.status">Delete</button>
+            </template>
+        </modal-component>
+        <!-- end modal DELETE_STASH_MODAL -->
 
     </div>
 </template>
@@ -85,6 +148,51 @@
                     id: 'addStashModal',
                     title: 'Add New Stash'
                 },
+                modalEdit: {
+                    id: 'editStashModal',
+                    title: 'Edit Stash'
+                },
+                modalDelete: {
+                    id: 'deleteStashModal',
+                    title: 'Delete Stash'
+                },
+                stash_card_columns: {
+                    id: {
+                        title: 'ID'
+                    },
+                    user_id: {
+                        title: 'User ID'
+                    },
+                    title: {
+                        title: 'Stash'
+                    },
+                    topic: {
+                        title: 'Related Topic'
+                    },
+                    description: {
+                        title: 'Description'
+                    }
+                },
+                stash_card_buttons: {
+                    // view: {
+                    //     type: 'link',
+                    //     title: 'View',
+                    //     class: 'primary',
+                    //     target: ''
+                    // },
+                    edit: {
+                        type: 'modal',
+                        title: 'Edit',
+                        class: 'success',
+                        target: '#editStashModal'
+                    },
+                    delete: {
+                        type: 'modal',
+                        title: 'Delete',
+                        class: 'danger',
+                        target: '#deleteStashModal'
+                    }
+                },
                 alert: {
                     status: null,
                     object: {},
@@ -108,29 +216,36 @@
                     {id: '26', title: 'artifact 26', stash_id: '5', tags: ['cards']},
                     {id: '27', title: 'artifact 27', stash_id: '5', tags: ['cards']},
                 ]},
+                ],
+                mockTopics: [
+                    {id: '1', title: 'topic model 01'},
+                    {id: '2', title: 'topic model 02'},
+                    {id: '3', title: 'topic model 03'},
+                    {id: '4', title: 'topic model 04'},
+                    {id: '5', title: 'topic model 05'},
+                    {id: '6', title: 'topic model 06'},
                 ]
             }
         },
         methods: {
             loadStashes() {
-                this.stashes = this.mockStashes;
+                let url = this.baseUrl + '/stashes/all-stashes/' + this.userid;
 
-                // let url = this.baseUrl + '/stashes/all-stashes/' + this.userid;
+                let config = {
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                }
 
-                // let config = {
-                //     headers: {
-                //         'Accept': 'application/json',
-                //     }
-                // }
-
-                // axios.get(url, config)
-                //     .then(response => {
-                //         console.log(response);
-                //         this.stashes = response.data;
-                //     })
-                //     .catch(errors => {
-                //         console.log(errors);
-                //     });
+                axios.get(url, config)
+                    .then(response => {
+                        this.stashes = response.data.content;
+                        console.log('%c Load stashes Success: \n Route: ', 'background: #41AF41', url, response);
+                    })
+                    .catch(errors => {
+                        this.stashes = this.mockStashes;
+                        console.log('%c Load stashes Error: loading mock stashes instead \n Route: ', 'background: #FEC302', url, errors.response);
+                    });
             },
             loadTopics() {
                 let url = this.baseUrl + '/topic/all-topics';
@@ -143,11 +258,12 @@
 
                 axios.get(url, config)
                     .then(response => {
-                        console.log(response);
-                        this.topics = response.data;
+                        this.topics = response.data.content;
+                        console.log('%c Load topics Success: check it out! \n Route: ', 'background: #41AF41', url, response);
                     })
                     .catch(errors => {
-                        console.log (errors);
+                        this.topics = this.mockTopics;
+                        console.log('%c Load Topics Error: loading mock topics instead \n Route: ', 'background: #FEC302', url, errors.response);
                     });
             },
             addStash() {
@@ -161,7 +277,7 @@
 
                 let config = {
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'multipart/form-date',
                         'Accept': 'application/json'
                     }
                 };
@@ -171,26 +287,81 @@
                         this.alert.status = 'success';
                         this.alert.object = response.data;
                         this.loadStashes();
-                        console.log(response);
+                        console.log('%c Add stash Success: check it out! \n Route: ', 'background: #41AF41', url, response);
                     })
                     .catch(errors => {
                         this.alert.status = 'danger';
                         this.alert.message = errors.response.message;
                         this.alert.errors = errors.response.errors;
-                        console.log(errors.response);
+                        console.log('%c Add stash Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+                    })
+            },
+            updateStash() {
+                let url = this.baseUrl + '/stash/' + this.$store.state.item.id;
+
+                let formData = new FormData();
+                formData.append('user_id', this.userid);
+                formData.append('title', this.$store.state.item.title);
+                formData.append('topic', this.$store.state.item.topic);
+                formData.append('description', this.$store.state.item.description);
+
+                let config = {
+                    headers: {
+                        'Content-Type': 'multipart/form-date',
+                        'Accept': 'application/json'
+                    }
+                };
+
+                axios.post(url, formData, config)
+                    .then(response => {
+                        this.alert.status = 'success';
+                        this.alert.object = response.data;
+                        this.loadStashes();
+                        console.log('%c Update stash Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+                    })
+                    .catch(errors => {
+                        this.alert.status = 'danger';
+                        this.alert.message = errors.response.message;
+                        this.alert.errors = errors.response.errors;
+                        console.log('%c Update stash Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+                    })
+            },
+            deleteStash() {
+                let url = this.baseUrl + '/stash/' + this.$store.state.item.id;
+
+                let config = {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                };
+
+                axios.delete(url, config)
+                    .then(response => {
+                        this.alert.status = 'success';
+                        this.loadStashes();
+                        console.log('%c Delete stash Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+                    })
+                    .catch(errors => {
+                        this.alert.status = 'danger';
+                        this.alert.message = errors.response.message;
+                        this.alert.errors = errors.response.errors;
+                        console.log('%c Delete stash Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
                     })
             },
             cleanNewStashData() {
                 this.stashTitle = '',
                 this.stashTopic = '',
                 this.stashDescription = '',
+                this.cleanAlerts()
+            },
+            cleanAlerts() {
                 this.alert  = {
                     status: null,
                     object: {},
                     message: '',
                     errors: [],
                 }
-            },
+            }
         },
         mounted() {
             this.loadStashes();

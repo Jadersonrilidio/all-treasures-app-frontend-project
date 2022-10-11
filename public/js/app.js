@@ -5448,7 +5448,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.get(url, config).then(function (response) {
-        userid.value = response.data.id;
+        userid.value = response.data.userId;
         event.target.submit();
       })["catch"](function (errors) {
         console.log(errors.response);
@@ -5569,6 +5569,51 @@ __webpack_require__.r(__webpack_exports__);
         id: 'addStashModal',
         title: 'Add New Stash'
       },
+      modalEdit: {
+        id: 'editStashModal',
+        title: 'Edit Stash'
+      },
+      modalDelete: {
+        id: 'deleteStashModal',
+        title: 'Delete Stash'
+      },
+      stash_card_columns: {
+        id: {
+          title: 'ID'
+        },
+        user_id: {
+          title: 'User ID'
+        },
+        title: {
+          title: 'Stash'
+        },
+        topic: {
+          title: 'Related Topic'
+        },
+        description: {
+          title: 'Description'
+        }
+      },
+      stash_card_buttons: {
+        // view: {
+        //     type: 'link',
+        //     title: 'View',
+        //     class: 'primary',
+        //     target: ''
+        // },
+        edit: {
+          type: 'modal',
+          title: 'Edit',
+          "class": 'success',
+          target: '#editStashModal'
+        },
+        "delete": {
+          type: 'modal',
+          title: 'Delete',
+          "class": 'danger',
+          target: '#deleteStashModal'
+        }
+      },
       alert: {
         status: null,
         object: {},
@@ -5657,28 +5702,48 @@ __webpack_require__.r(__webpack_exports__);
           stash_id: '5',
           tags: ['cards']
         }]
+      }],
+      mockTopics: [{
+        id: '1',
+        title: 'topic model 01'
+      }, {
+        id: '2',
+        title: 'topic model 02'
+      }, {
+        id: '3',
+        title: 'topic model 03'
+      }, {
+        id: '4',
+        title: 'topic model 04'
+      }, {
+        id: '5',
+        title: 'topic model 05'
+      }, {
+        id: '6',
+        title: 'topic model 06'
       }]
     };
   },
   methods: {
     loadStashes: function loadStashes() {
-      this.stashes = this.mockStashes; // let url = this.baseUrl + '/stashes/all-stashes/' + this.userid;
-      // let config = {
-      //     headers: {
-      //         'Accept': 'application/json',
-      //     }
-      // }
-      // axios.get(url, config)
-      //     .then(response => {
-      //         console.log(response);
-      //         this.stashes = response.data;
-      //     })
-      //     .catch(errors => {
-      //         console.log(errors);
-      //     });
+      var _this = this;
+
+      var url = this.baseUrl + '/stashes/all-stashes/' + this.userid;
+      var config = {
+        headers: {
+          'Accept': 'application/json'
+        }
+      };
+      axios.get(url, config).then(function (response) {
+        _this.stashes = response.data.content;
+        console.log('%c Load stashes Success: \n Route: ', 'background: #41AF41', url, response);
+      })["catch"](function (errors) {
+        _this.stashes = _this.mockStashes;
+        console.log('%c Load stashes Error: loading mock stashes instead \n Route: ', 'background: #FEC302', url, errors.response);
+      });
     },
     loadTopics: function loadTopics() {
-      var _this = this;
+      var _this2 = this;
 
       var url = this.baseUrl + '/topic/all-topics';
       var config = {
@@ -5687,14 +5752,15 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.get(url, config).then(function (response) {
-        console.log(response);
-        _this.topics = response.data;
+        _this2.topics = response.data.content;
+        console.log('%c Load topics Success: check it out! \n Route: ', 'background: #41AF41', url, response);
       })["catch"](function (errors) {
-        console.log(errors);
+        _this2.topics = _this2.mockTopics;
+        console.log('%c Load Topics Error: loading mock topics instead \n Route: ', 'background: #FEC302', url, errors.response);
       });
     },
     addStash: function addStash() {
-      var _this2 = this;
+      var _this3 = this;
 
       var url = this.baseUrl + '/stash/create';
       var formData = new FormData();
@@ -5704,26 +5770,80 @@ __webpack_require__.r(__webpack_exports__);
       formData.append('description', this.stashDescription);
       var config = {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-date',
           'Accept': 'application/json'
         }
       };
       axios.post(url, formData, config).then(function (response) {
-        _this2.alert.status = 'success';
-        _this2.alert.object = response.data;
+        _this3.alert.status = 'success';
+        _this3.alert.object = response.data;
 
-        _this2.loadStashes();
+        _this3.loadStashes();
 
-        console.log(response);
+        console.log('%c Add stash Success: check it out! \n Route: ', 'background: #41AF41', url, response);
       })["catch"](function (errors) {
-        _this2.alert.status = 'danger';
-        _this2.alert.message = errors.response.message;
-        _this2.alert.errors = errors.response.errors;
-        console.log(errors.response);
+        _this3.alert.status = 'danger';
+        _this3.alert.message = errors.response.message;
+        _this3.alert.errors = errors.response.errors;
+        console.log('%c Add stash Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+      });
+    },
+    updateStash: function updateStash() {
+      var _this4 = this;
+
+      var url = this.baseUrl + '/stash/' + this.$store.state.item.id;
+      var formData = new FormData();
+      formData.append('user_id', this.userid);
+      formData.append('title', this.$store.state.item.title);
+      formData.append('topic', this.$store.state.item.topic);
+      formData.append('description', this.$store.state.item.description);
+      var config = {
+        headers: {
+          'Content-Type': 'multipart/form-date',
+          'Accept': 'application/json'
+        }
+      };
+      axios.post(url, formData, config).then(function (response) {
+        _this4.alert.status = 'success';
+        _this4.alert.object = response.data;
+
+        _this4.loadStashes();
+
+        console.log('%c Update stash Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+      })["catch"](function (errors) {
+        _this4.alert.status = 'danger';
+        _this4.alert.message = errors.response.message;
+        _this4.alert.errors = errors.response.errors;
+        console.log('%c Update stash Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+      });
+    },
+    deleteStash: function deleteStash() {
+      var _this5 = this;
+
+      var url = this.baseUrl + '/stash/' + this.$store.state.item.id;
+      var config = {
+        headers: {
+          'Accept': 'application/json'
+        }
+      };
+      axios["delete"](url, config).then(function (response) {
+        _this5.alert.status = 'success';
+
+        _this5.loadStashes();
+
+        console.log('%c Delete stash Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+      })["catch"](function (errors) {
+        _this5.alert.status = 'danger';
+        _this5.alert.message = errors.response.message;
+        _this5.alert.errors = errors.response.errors;
+        console.log('%c Delete stash Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
       });
     },
     cleanNewStashData: function cleanNewStashData() {
-      this.stashTitle = '', this.stashTopic = '', this.stashDescription = '', this.alert = {
+      this.stashTitle = '', this.stashTopic = '', this.stashDescription = '', this.cleanAlerts();
+    },
+    cleanAlerts: function cleanAlerts() {
+      this.alert = {
         status: null,
         object: {},
         message: '',
@@ -5751,48 +5871,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['stash'],
+  props: ['columns', 'buttons', 'stash'],
   data: function data() {
     return {
       baseUrl: 'http://alltreasures.herokuapp.com',
       artifacts: [],
-      buttons: {
-        view: {
-          title: 'View',
-          "class": 'primary',
-          target: '',
-          baseLink: 'http://localhost:8000/stash'
-        },
-        edit: {
-          title: 'Edit',
-          "class": 'success',
-          target: '#editStashModal',
-          baseLink: '#'
-        },
-        "delete": {
-          title: 'Delete',
-          "class": 'danger',
-          target: '#deleteStashModal',
-          baseLink: '#'
-        }
-      },
-      columns: {
-        id: {
-          title: 'ID'
-        },
-        user_id: {
-          title: 'User ID'
-        },
-        title: {
-          title: 'Stash'
-        },
-        topic: {
-          title: 'Related Topic'
-        },
-        description: {
-          title: 'Description'
-        }
-      },
       table_columns: {
         id: 'ID',
         title: 'Artifact',
@@ -5826,23 +5909,25 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     loadStashArtifacts: function loadStashArtifacts() {
-      this.artifacts = this.stash.artifacts; // let url = this.baseUrl + '/artifact/all-artifacts/stash_id=' + this.stash.id;
-      // let config = {
-      //     headers: {
-      //         'Accept': 'application/json'
-      //     }
-      // };
-      // axios.get(url, config)
-      //     .then(response => {
-      //         this.artifacts = response.data;
-      //         console.log(response);
-      //     })
-      //     .catch(errors => {
-      //         console.log(errors.response);
-      //     })
+      var _this = this;
+
+      var url = this.baseUrl + '/artifact/all-artifacts/stash_id=' + this.stash.id;
+      var config = {
+        headers: {
+          'Accept': 'application/json'
+        }
+      };
+      axios.get(url, config).then(function (response) {
+        _this.artifacts = response.data.content; // this.artifacts = this.stash.artifacts;
+
+        console.log('%c Load stash ' + _this.stash.title + ' artifacts Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+      })["catch"](function (errors) {
+        _this.artifacts = _this.stash.artifacts;
+        console.log('%c Load stash ' + _this.stash.title + ' artifacts Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+      });
     },
     addArtifact: function addArtifact() {
-      var _this = this;
+      var _this2 = this;
 
       var url = this.baseUrl + '/artifact/create';
       var formData = new FormData();
@@ -5856,20 +5941,23 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.post(url, formData, config).then(function (response) {
-        _this.alert.status = 'success';
-        _this.alert.object = response.data;
+        _this2.alert.status = 'success';
+        _this2.alert.object = response.data;
 
-        _this.loadStashArtifacts();
+        _this2.loadStashArtifacts();
 
-        _this.cleanNewArtifactData();
+        _this2.cleanNewArtifactData();
 
-        console.log(response);
+        console.log('%c Add artifact Success: check it out! \n Route: ', 'background: #41AF41', url, response);
       })["catch"](function (errors) {
-        console.log(errors);
+        console.log('%c Add artifact Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
       });
     },
     cleanNewArtifactData: function cleanNewArtifactData() {
-      this.artifactTitle = '', this.artifactStashId = this.stash.id, this.artifactTags = '', this.alert = {
+      this.artifactTitle = '', this.artifactStashId = this.stash.id, this.artifactTags = '', this.cleanAlert();
+    },
+    cleanAlert: function cleanAlert() {
+      this.alert = {
         status: null,
         object: {},
         message: '',
@@ -5885,6 +5973,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     toggleArtifactsTable: function toggleArtifactsTable() {
       this.stash.table_show = this.stash.table_show ? false : true;
+    },
+    storeItem: function storeItem(stash) {
+      this.$store.state.item = stash;
     }
   },
   computed: {
@@ -5998,10 +6089,10 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.get(url, config).then(function (response) {
-        console.log(response);
         _this.topics = response.data.content;
+        console.log('%c Add topic Success: check it out!', 'background: #41AF41', "Route: ".concat(url), response);
       })["catch"](function (errors) {
-        console.log(errors);
+        console.log('%c Add topic Error: nothing happened', 'background: #FEC302', "Route: ".concat(url), errors.response);
       });
     },
     addTopic: function addTopic() {
@@ -6017,18 +6108,19 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.post(url, formData, config).then(function (response) {
-        console.log(response);
         _this2.alert.status = 'success';
         _this2.alert.object = response.data;
 
         _this2.loadTopics();
 
         _this2.cleanNewTopicData();
+
+        console.log('%c Add topic Success: check it out!', 'background: #41AF41', "Route: ".concat(url), response);
       })["catch"](function (errors) {
-        console.log(errors.response);
         _this2.alert.status = 'danger';
         _this2.alert.message = errors.response.message;
         _this2.alert.errors = errors.response.errors;
+        console.log('%c Add topic Error: nothing happened', 'background: #FEC302', "Route: ".concat(url), errors.response);
       });
     },
     updateTopic: function updateTopic() {
@@ -6044,16 +6136,17 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.post(url, formData, config).then(function (response) {
-        console.log(response);
         _this3.alert.status = 'success';
         _this3.alert.object = response.data;
 
         _this3.loadTopics();
+
+        console.log('%c Update topic Success: check it out!', 'background: #41AF41', "Route: ".concat(url), response);
       })["catch"](function (errors) {
-        console.log(errors.response);
         _this3.alert.status = 'danger';
         _this3.alert.message = errors.response.message;
         _this3.alert.errors = errors.response.errors;
+        console.log('%c Update topic Error: nothing happened', 'background: #FEC302', "Route: ".concat(url), errors.response);
       });
     },
     deleteTopic: function deleteTopic() {
@@ -6070,9 +6163,9 @@ __webpack_require__.r(__webpack_exports__);
 
         _this4.loadTopics();
 
-        console.log(response);
+        console.log('%c Delete topic Success: check it out!', 'background: #41AF41', "Route: ".concat(url), response);
       })["catch"](function (errors) {
-        console.log(errors.response);
+        console.log('%c Delete topic Error: nothing happened', 'background: #FEC302', "Route: ".concat(url), errors.response);
       });
     },
     cleanNewTopicData: function cleanNewTopicData() {
@@ -6683,7 +6776,9 @@ var render = function render() {
           return _c("stash-card-component", {
             key: i,
             attrs: {
-              stash: stash
+              stash: stash,
+              columns: _vm.stash_card_columns,
+              buttons: _vm.stash_card_buttons
             }
           });
         });
@@ -6789,21 +6884,38 @@ var render = function render() {
             title: "Topic"
           }
         }, [_c("select", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.stashTopic,
+            expression: "stashTopic"
+          }],
           attrs: {
             id: ""
+          },
+          on: {
+            change: function change($event) {
+              var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+                return o.selected;
+              }).map(function (o) {
+                var val = "_value" in o ? o._value : o.value;
+                return val;
+              });
+              _vm.stashTopic = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
+            }
           }
         }, [_c("option", {
           attrs: {
             value: "",
             selected: ""
           }
-        }, [_vm._v(" Select a topic: ")]), _vm._v(" "), _vm._l(_vm.topics, function (topic, key) {
+        }, [_vm._v(" -- Select a topic: -- ")]), _vm._v(" "), _vm._l(_vm.topics, function (topic, key) {
           return _c("option", {
             key: key,
             domProps: {
               value: topic.id
             }
-          }, [_vm._v("\n                        " + _vm._s(topic.id) + " - " + _vm._s(topic.title) + "\n                    ")]);
+          }, [_vm._v("\n                        " + _vm._s(topic.title) + "\n                    ")]);
         })], 2)])];
       },
       proxy: true
@@ -6838,6 +6950,225 @@ var render = function render() {
             }
           }
         }, [_vm._v("Add")])];
+      },
+      proxy: true
+    }])
+  }), _vm._v(" "), _c("modal-component", {
+    attrs: {
+      id: _vm.modalEdit.id,
+      title: _vm.modalEdit.title
+    },
+    scopedSlots: _vm._u([{
+      key: "alerts",
+      fn: function fn() {
+        return [_c("alert-component", {
+          attrs: {
+            details: _vm.alert
+          }
+        })];
+      },
+      proxy: true
+    }, {
+      key: "content",
+      fn: function fn() {
+        return [_c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "stashTitle",
+            title: "Title"
+          }
+        }, [_vm.$store.state.item.title ? _c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.$store.state.item.title,
+            expression: "$store.state.item.title"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            id: "stashTitle",
+            type: "text",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.$store.state.item.title
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+
+              _vm.$set(_vm.$store.state.item, "title", $event.target.value);
+            }
+          }
+        }) : _vm._e()]), _vm._v(" "), _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "stashDescription",
+            title: "Description"
+          }
+        }, [_vm.$store.state.item.description ? _c("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.$store.state.item.description,
+            expression: "$store.state.item.description"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            id: "stashDescription",
+            type: "text",
+            required: "",
+            autofocus: ""
+          },
+          domProps: {
+            value: _vm.$store.state.item.description
+          },
+          on: {
+            input: function input($event) {
+              if ($event.target.composing) return;
+
+              _vm.$set(_vm.$store.state.item, "description", $event.target.value);
+            }
+          }
+        }) : _vm._e()]), _vm._v(" "), _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            id: "stashTopic",
+            title: "Topic"
+          }
+        }, [_vm.$store.state.item.topic ? _c("select", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: _vm.$store.state.item.topic,
+            expression: "$store.state.item.topic"
+          }],
+          attrs: {
+            id: ""
+          },
+          on: {
+            change: function change($event) {
+              var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+                return o.selected;
+              }).map(function (o) {
+                var val = "_value" in o ? o._value : o.value;
+                return val;
+              });
+
+              _vm.$set(_vm.$store.state.item, "topic", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+            }
+          }
+        }, [_c("option", {
+          attrs: {
+            value: ""
+          }
+        }, [_vm._v(" -- Select a topic: -- ")]), _vm._v(" "), _vm._l(_vm.topics, function (topic, key) {
+          return _c("option", {
+            key: key,
+            domProps: {
+              value: topic.id
+            }
+          }, [_vm._v("\n                        " + _vm._s(topic.title) + "\n                    ")]);
+        })], 2) : _vm._e()])];
+      },
+      proxy: true
+    }, {
+      key: "footer",
+      fn: function fn() {
+        return [_c("button", {
+          staticClass: "btn btn-secondary",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            "data-bs-dismiss": "modal"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.cleanAlerts();
+            }
+          }
+        }, [_vm._v("Cancel")]), _vm._v(" "), _c("button", {
+          staticClass: "btn btn-success",
+          staticStyle: {
+            "float": "right"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.updateStash();
+            }
+          }
+        }, [_vm._v("Update")])];
+      },
+      proxy: true
+    }])
+  }), _vm._v(" "), _c("modal-component", {
+    attrs: {
+      id: _vm.modalDelete.id,
+      title: _vm.modalDelete.title
+    },
+    scopedSlots: _vm._u([{
+      key: "alerts",
+      fn: function fn() {
+        return [_c("alert-component", {
+          attrs: {
+            details: _vm.alert
+          }
+        })];
+      },
+      proxy: true
+    }, {
+      key: "content",
+      fn: function fn() {
+        return [!_vm.alert.status ? _c("input-component", {
+          attrs: {
+            classes: "row mb-3",
+            title: "Title"
+          }
+        }, [_vm.$store.state.item.title ? _c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            disabled: ""
+          },
+          domProps: {
+            value: _vm.$store.state.item.title
+          }
+        }) : _vm._e()]) : _vm._e(), _vm._v(" "), _c("div", {
+          staticStyle: {
+            "text-align": "center"
+          }
+        }, [_c("span", [_c("b", [_vm._v("ATTENTION!!!")]), _vm._v("\n                    All contained artifacts will be deleted as well.\n                ")])])];
+      },
+      proxy: true
+    }, {
+      key: "footer",
+      fn: function fn() {
+        return [_c("span", [_vm._v("Are you sure to delete stash?    ")]), _vm._v(" "), _c("button", {
+          staticClass: "btn btn-secondary",
+          staticStyle: {
+            "float": "right"
+          },
+          attrs: {
+            "data-bs-dismiss": "modal"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.cleanAlerts();
+            }
+          }
+        }, [_vm._v("Close")]), _vm._v(" "), !_vm.alert.status ? _c("button", {
+          staticClass: "btn btn-danger",
+          staticStyle: {
+            "float": "right"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.deleteStash();
+            }
+          }
+        }, [_vm._v("Delete")]) : _vm._e()];
       },
       proxy: true
     }])
@@ -6899,9 +7230,13 @@ var render = function render() {
       },
       attrs: {
         type: "submit",
-        href: button.baseLink,
-        "data-toggle": "modal",
-        "data-target": button.target
+        "data-bs-toggle": "modal",
+        "data-bs-target": button.target
+      },
+      on: {
+        click: function click($event) {
+          return _vm.storeItem(_vm.stash);
+        }
       }
     }, [_vm._v("\n                    " + _vm._s(button.title) + "\n                ")]);
   }), 0)])]), _vm._v(" "), _vm.stash.show ? _c("div", {

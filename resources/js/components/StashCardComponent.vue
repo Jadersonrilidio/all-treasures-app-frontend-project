@@ -8,13 +8,13 @@
 
                 <div class="navbar-nav" style="display:inline;float:right">
                     <button v-for="button, i in buttons" :key="i"
-                        class="btn btn-sm"
                         style="margin-left:10px"
-                        type="submit"
-                        :href="button.baseLink"
-                        data-toggle="modal"
+                        class="btn btn-sm"
                         :class="'btn-outline-'+button.class"
-                        :data-target="button.target"
+                        type="submit"
+                        data-bs-toggle="modal"
+                        :data-bs-target="button.target"
+                        @click="storeItem(stash)"
                     >
                         {{ button.title }}
                     </button>
@@ -114,49 +114,14 @@
 <script>
     export default {
         props: [
+            'columns',
+            'buttons',
             'stash'
         ],
         data() {
             return {
                 baseUrl: 'http://alltreasures.herokuapp.com',
                 artifacts: [],
-                buttons: {
-                    view: {
-                        title: 'View',
-                        class: 'primary',
-                        target: '',
-                        baseLink: 'http://localhost:8000/stash',
-                    },
-                    edit: {
-                        title: 'Edit',
-                        class: 'success',
-                        target: '#editStashModal',
-                        baseLink: '#'
-                    },
-                    delete: {
-                        title: 'Delete',
-                        class: 'danger',
-                        target: '#deleteStashModal',
-                        baseLink: '#'
-                    }
-                },
-                columns: {
-                    id: {
-                        title: 'ID'
-                    },
-                    user_id: {
-                        title: 'User ID'
-                    },
-                    title: {
-                        title: 'Stash'
-                    },
-                    topic: {
-                        title: 'Related Topic'
-                    },
-                    description: {
-                        title: 'Description'
-                    }
-                },
                 table_columns: {
                     id: 'ID',
                     title: 'Artifact',
@@ -190,24 +155,24 @@
         },
         methods: {
             loadStashArtifacts() {
-                this.artifacts = this.stash.artifacts;
+                let url = this.baseUrl + '/artifact/all-artifacts/stash_id=' + this.stash.id;
 
-                // let url = this.baseUrl + '/artifact/all-artifacts/stash_id=' + this.stash.id;
+                let config = {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                };
 
-                // let config = {
-                //     headers: {
-                //         'Accept': 'application/json'
-                //     }
-                // };
-
-                // axios.get(url, config)
-                //     .then(response => {
-                //         this.artifacts = response.data;
-                //         console.log(response);
-                //     })
-                //     .catch(errors => {
-                //         console.log(errors.response);
-                //     })
+                axios.get(url, config)
+                    .then(response => {
+                        this.artifacts = response.data.content;
+                        // this.artifacts = this.stash.artifacts;
+                        console.log('%c Load stash ' + this.stash.title + ' artifacts Success: check it out! \n Route: ', 'background: #41AF41', url, response);
+                    })
+                    .catch(errors => {
+                        this.artifacts = this.stash.artifacts;
+                        console.log('%c Load stash ' + this.stash.title + ' artifacts Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
+                    })
             },
             addArtifact() {
                 let url = this.baseUrl + '/artifact/create';
@@ -230,16 +195,19 @@
                         this.alert.object = response.data;
                         this.loadStashArtifacts();
                         this.cleanNewArtifactData();
-                        console.log(response);
+                        console.log('%c Add artifact Success: check it out! \n Route: ', 'background: #41AF41', url, response);
                     })
                     .catch(errors => {
-                        console.log(errors);
+                        console.log('%c Add artifact Error: nothing happened \n Route: ', 'background: #FEC302', url, errors.response);
                     })
             },
             cleanNewArtifactData() {
                 this.artifactTitle = '',
                 this.artifactStashId = this.stash.id,
                 this.artifactTags = '',
+                this.cleanAlert()
+            },
+            cleanAlert() {
                 this.alert = {
                     status: null,
                     object: {},
@@ -256,6 +224,9 @@
             },
             toggleArtifactsTable() {
                 this.stash.table_show = this.stash.table_show ? false : true;
+            },
+            storeItem(stash) {
+                this.$store.state.item = stash;
             }
         },
         computed: {

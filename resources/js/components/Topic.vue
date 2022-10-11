@@ -154,11 +154,11 @@
 
                 axios.get(url, config)
                     .then(response => {
-                        console.log(response);
                         this.topics = response.data.content;
+                        console.log('%c Add topic Success: check it out!', 'background: #41AF41', `Route: ${url}`, response);
                     })
                     .catch(errors => {
-                        console.log(errors);
+                        console.log('%c Add topic Error: nothing happened', 'background: #FEC302', `Route: ${url}`, errors.response);
                     });
             },
             addTopic() {
@@ -176,17 +176,17 @@
 
                 axios.post(url, formData, config)
                     .then(response => {
-                        console.log(response);
                         this.alert.status = 'success';
                         this.alert.object = response.data;
                         this.loadTopics();
                         this.cleanNewTopicData();
+                        console.log('%c Add topic Success: check it out!', 'background: #41AF41', `Route: ${url}`, response);
                     })
                     .catch(errors => {
-                        console.log(errors.response);
                         this.alert.status = 'danger';
                         this.alert.message = errors.response.message;
                         this.alert.errors = errors.response.errors;
+                        console.log('%c Add topic Error: nothing happened', 'background: #FEC302', `Route: ${url}`, errors.response);
                     })
             },
             updateTopic() {
@@ -204,16 +204,16 @@
 
                 axios.post(url, formData, config)
                     .then(response => {
-                        console.log(response);
                         this.alert.status = 'success';
                         this.alert.object = response.data;
                         this.loadTopics();
+                        console.log('%c Update topic Success: check it out!', 'background: #41AF41', `Route: ${url}`, response);
                     })
                     .catch(errors => {
-                        console.log(errors.response);
                         this.alert.status = 'danger';
                         this.alert.message = errors.response.message;
                         this.alert.errors = errors.response.errors;
+                        console.log('%c Update topic Error: nothing happened', 'background: #FEC302', `Route: ${url}`, errors.response);
                     })
             },
             deleteTopic() {
@@ -230,10 +230,10 @@
                         this.alert.status = 'success';
                         // this.alert.object = response.data.content;
                         this.loadTopics();
-                        console.log(response);
+                        console.log('%c Delete topic Success: check it out!', 'background: #41AF41', `Route: ${url}`, response);
                     })
                     .catch(errors => {
-                        console.log(errors.response);
+                        console.log('%c Delete topic Error: nothing happened', 'background: #FEC302', `Route: ${url}`, errors.response);
                     });
             },
             cleanNewTopicData() {
